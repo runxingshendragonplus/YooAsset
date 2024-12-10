@@ -76,9 +76,18 @@ namespace YooAsset
 
                 if (_loadBundleOp.Status == EOperationStatus.Succeed)
                 {
-                    _steps = ESteps.Done;
-                    Result = _loadBundleOp.Result;
-                    Status = EOperationStatus.Succeed;
+                    if (_loadBundleOp.Result == null)
+                    {
+                        _steps = ESteps.Done;
+                        Status = EOperationStatus.Failed;
+                        Error = $"The bundle loader result is null ! {BundleFileInfo.Bundle.BundleName}";
+                    }
+                    else
+                    {
+                        _steps = ESteps.Done;
+                        Result = _loadBundleOp.Result;
+                        Status = EOperationStatus.Succeed;
+                    }
                 }
                 else
                 {
