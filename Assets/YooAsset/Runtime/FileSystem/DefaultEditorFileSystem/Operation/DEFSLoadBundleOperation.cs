@@ -16,6 +16,7 @@ namespace YooAsset
             DownloadProgress = 1f;
             DownloadedBytes = _bundle.FileSize;
             Status = EOperationStatus.Succeed;
+            Result = new VirtualBundle(_fileSystem, _bundle);
         }
         internal override void InternalOnUpdate()
         {
