@@ -69,6 +69,9 @@ namespace YooAsset
                 if (_loadBundleOp == null)
                     _loadBundleOp = BundleFileInfo.LoadBundleFile();
 
+                if (IsWaitForAsyncComplete)
+                    _loadBundleOp.WaitForAsyncComplete();
+
                 DownloadProgress = _loadBundleOp.DownloadProgress;
                 DownloadedBytes = _loadBundleOp.DownloadedBytes;
                 if (_loadBundleOp.IsDone == false)
@@ -101,9 +104,6 @@ namespace YooAsset
         {
             while (true)
             {
-                if (_loadBundleOp != null)
-                    _loadBundleOp.WaitForAsyncComplete();
-
                 if (ExecuteWhileDone())
                 {
                     _steps = ESteps.Done;

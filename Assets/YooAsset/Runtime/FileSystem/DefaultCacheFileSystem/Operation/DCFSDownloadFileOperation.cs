@@ -94,6 +94,9 @@ namespace YooAsset
             // 等待验证完成
             if (_steps == ESteps.CheckVerifyTempFile)
             {
+                if (IsWaitForAsyncComplete)
+                    _verifyOperation.WaitForAsyncComplete();
+
                 if (_verifyOperation.IsDone == false)
                     return;
 
@@ -154,9 +157,6 @@ namespace YooAsset
 
             while (true)
             {
-                if (_verifyOperation != null)
-                    _verifyOperation.WaitForAsyncComplete();
-
                 // 注意：如果是导入或解压本地文件，执行等待完毕
                 if (isReuqestLocalFile)
                 {
@@ -305,6 +305,9 @@ namespace YooAsset
             // 等待验证完成
             if (_steps == ESteps.CheckVerifyTempFile)
             {
+                if (IsWaitForAsyncComplete)
+                    _verifyOperation.WaitForAsyncComplete();
+
                 if (_verifyOperation.IsDone == false)
                     return;
 
@@ -364,9 +367,6 @@ namespace YooAsset
 
             while (true)
             {
-                if (_verifyOperation != null)
-                    _verifyOperation.WaitForAsyncComplete();
-
                 // 注意：如果是导入或解压本地文件，执行等待完毕
                 if (isReuqestLocalFile)
                 {
