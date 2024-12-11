@@ -171,9 +171,9 @@ namespace YooAsset
         private enum ESteps
         {
             None,
-            CreateFileSystem,
+            CreateBuildinFileSystem,
             InitBuildinFileSystem,
-            InitDeliveryFileSystem,
+            CreateCacheFileSystem,
             InitCacheFileSystem,
             Done,
         }
@@ -181,7 +181,6 @@ namespace YooAsset
         private readonly HostPlayModeImpl _impl;
         private readonly HostPlayModeParameters _parameters;
         private FSInitializeFileSystemOperation _initBuildinFileSystemOp;
-        private FSInitializeFileSystemOperation _initDeliveryFileSystemOp;
         private FSInitializeFileSystemOperation _initCacheFileSystemOp;
         private ESteps _steps = ESteps.None;
 
@@ -192,14 +191,55 @@ namespace YooAsset
         }
         internal override void InternalOnStart()
         {
-            _steps = ESteps.CreateFileSystem;
+            _steps = ESteps.CreateBuildinFileSystem;
         }
         internal override void InternalOnUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
-            if (_steps == ESteps.CreateFileSystem)
+            if (_steps == ESteps.CreateBuildinFileSystem)
+            {
+                if (_parameters.BuildinFileSystemParameters == null)
+                {
+                    _steps = ESteps.CreateCacheFileSystem;
+                    return;
+                }
+
+                _impl.BuildinFileSystem = PlayModeHelper.CreateFileSystem(_impl.PackageName, _parameters.BuildinFileSystemParameters);
+                if (_impl.BuildinFileSystem == null)
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Failed;
+                    Error = "Failed to create buildin file system";
+                    return;
+                }
+
+                _steps = ESteps.InitBuildinFileSystem;
+            }
+
+            if (_steps == ESteps.InitBuildinFileSystem)
+            {
+                if (_initBuildinFileSystemOp == null)
+                    _initBuildinFileSystemOp = _impl.BuildinFileSystem.InitializeFileSystemAsync();
+
+                Progress = _initBuildinFileSystemOp.Progress;
+                if (_initBuildinFileSystemOp.IsDone == false)
+                    return;
+
+                if (_initBuildinFileSystemOp.Status == EOperationStatus.Succeed)
+                {
+                    _steps = ESteps.CreateCacheFileSystem;
+                }
+                else
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Failed;
+                    Error = _initBuildinFileSystemOp.Error;
+                }
+            }
+
+            if (_steps == ESteps.CreateCacheFileSystem)
             {
                 if (_parameters.CacheFileSystemParameters == null)
                 {
@@ -207,30 +247,6 @@ namespace YooAsset
                     Status = EOperationStatus.Failed;
                     Error = "Cache file system parameters is null";
                     return;
-                }
-
-                if (_parameters.BuildinFileSystemParameters != null)
-                {
-                    _impl.BuildinFileSystem = PlayModeHelper.CreateFileSystem(_impl.PackageName, _parameters.BuildinFileSystemParameters);
-                    if (_impl.BuildinFileSystem == null)
-                    {
-                        _steps = ESteps.Done;
-                        Status = EOperationStatus.Failed;
-                        Error = "Failed to create buildin file system";
-                        return;
-                    }
-                }
-
-                if (_parameters.DeliveryFileSystemParameters != null)
-                {
-                    _impl.DeliveryFileSystem = PlayModeHelper.CreateFileSystem(_impl.PackageName, _parameters.DeliveryFileSystemParameters);
-                    if (_impl.DeliveryFileSystem == null)
-                    {
-                        _steps = ESteps.Done;
-                        Status = EOperationStatus.Failed;
-                        Error = "Failed to create delivery file system";
-                        return;
-                    }
                 }
 
                 _impl.CacheFileSystem = PlayModeHelper.CreateFileSystem(_impl.PackageName, _parameters.CacheFileSystemParameters);
@@ -242,63 +258,7 @@ namespace YooAsset
                     return;
                 }
 
-                _steps = ESteps.InitBuildinFileSystem;
-            }
-
-            if (_steps == ESteps.InitBuildinFileSystem)
-            {
-                // 注意：内置文件系统可以为空
-                if (_impl.BuildinFileSystem == null)
-                {
-                    _steps = ESteps.InitDeliveryFileSystem;
-                    return;
-                }
-
-                if (_initBuildinFileSystemOp == null)
-                    _initBuildinFileSystemOp = _impl.BuildinFileSystem.InitializeFileSystemAsync();
-
-                Progress = _initBuildinFileSystemOp.Progress;
-                if (_initBuildinFileSystemOp.IsDone == false)
-                    return;
-
-                if (_initBuildinFileSystemOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.InitDeliveryFileSystem;
-                }
-                else
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _initBuildinFileSystemOp.Error;
-                }
-            }
-
-            if (_steps == ESteps.InitDeliveryFileSystem)
-            {
-                // 注意：分发文件系统可以为空
-                if (_impl.DeliveryFileSystem == null)
-                {
-                    _steps = ESteps.InitCacheFileSystem;
-                    return;
-                }
-
-                Progress = _initDeliveryFileSystemOp.Progress;
-                if (_initDeliveryFileSystemOp == null)
-                    _initDeliveryFileSystemOp = _impl.DeliveryFileSystem.InitializeFileSystemAsync();
-
-                if (_initDeliveryFileSystemOp.IsDone == false)
-                    return;
-
-                if (_initDeliveryFileSystemOp.Status == EOperationStatus.Succeed)
-                {
-                    _steps = ESteps.InitCacheFileSystem;
-                }
-                else
-                {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = _initDeliveryFileSystemOp.Error;
-                }
+                _steps = ESteps.InitCacheFileSystem;
             }
 
             if (_steps == ESteps.InitCacheFileSystem)
@@ -445,7 +405,7 @@ namespace YooAsset
 
             if (_steps == ESteps.CheckResult)
             {
-                if(_impl.WebServerFileSystem == null && _impl.WebRemoteFileSystem == null)
+                if (_impl.WebServerFileSystem == null && _impl.WebRemoteFileSystem == null)
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;

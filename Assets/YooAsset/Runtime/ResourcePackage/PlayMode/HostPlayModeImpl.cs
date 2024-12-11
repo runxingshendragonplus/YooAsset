@@ -8,7 +8,6 @@ namespace YooAsset
     {
         public readonly string PackageName;
         public IFileSystem BuildinFileSystem { set; get; } //可以为空！
-        public IFileSystem DeliveryFileSystem { set; get; } //可以为空！
         public IFileSystem CacheFileSystem { set; get; }
 
 
@@ -35,9 +34,6 @@ namespace YooAsset
             if (BuildinFileSystem != null)
                 BuildinFileSystem.OnUpdate();
 
-            if (DeliveryFileSystem != null)
-                DeliveryFileSystem.OnUpdate();
-
             if (CacheFileSystem != null)
                 CacheFileSystem.OnUpdate();
         }
@@ -63,50 +59,50 @@ namespace YooAsset
 
         ClearAllBundleFilesOperation IPlayMode.ClearAllBundleFilesAsync()
         {
-            var operation = new ClearAllBundleFilesImplOperation(this, BuildinFileSystem, DeliveryFileSystem, CacheFileSystem);
+            var operation = new ClearAllBundleFilesImplOperation(this, BuildinFileSystem, CacheFileSystem, null);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
         ClearUnusedBundleFilesOperation IPlayMode.ClearUnusedBundleFilesAsync()
         {
-            var operation = new ClearUnusedBundleFilesImplOperation(this, BuildinFileSystem, DeliveryFileSystem, CacheFileSystem);
+            var operation = new ClearUnusedBundleFilesImplOperation(this, BuildinFileSystem, CacheFileSystem, null);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
 
         ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByAll(int downloadingMaxNumber, int failedTryAgain, int timeout)
         {
-            List<BundleInfo> downloadList = PlayModeHelper.GetDownloadListByAll(ActiveManifest, BuildinFileSystem, DeliveryFileSystem, CacheFileSystem);
+            List<BundleInfo> downloadList = PlayModeHelper.GetDownloadListByAll(ActiveManifest, BuildinFileSystem, CacheFileSystem);
             var operation = new ResourceDownloaderOperation(PackageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout);
             return operation;
         }
         ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByTags(string[] tags, int downloadingMaxNumber, int failedTryAgain, int timeout)
         {
-            List<BundleInfo> downloadList = PlayModeHelper.GetDownloadListByTags(ActiveManifest, tags, BuildinFileSystem, DeliveryFileSystem, CacheFileSystem);
+            List<BundleInfo> downloadList = PlayModeHelper.GetDownloadListByTags(ActiveManifest, tags, BuildinFileSystem, CacheFileSystem);
             var operation = new ResourceDownloaderOperation(PackageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout);
             return operation;
         }
         ResourceDownloaderOperation IPlayMode.CreateResourceDownloaderByPaths(AssetInfo[] assetInfos, int downloadingMaxNumber, int failedTryAgain, int timeout)
         {
-            List<BundleInfo> downloadList = PlayModeHelper.GetDownloadListByPaths(ActiveManifest, assetInfos, BuildinFileSystem, DeliveryFileSystem, CacheFileSystem);
+            List<BundleInfo> downloadList = PlayModeHelper.GetDownloadListByPaths(ActiveManifest, assetInfos, BuildinFileSystem, CacheFileSystem);
             var operation = new ResourceDownloaderOperation(PackageName, downloadList, downloadingMaxNumber, failedTryAgain, timeout);
             return operation;
         }
         ResourceUnpackerOperation IPlayMode.CreateResourceUnpackerByAll(int upackingMaxNumber, int failedTryAgain, int timeout)
         {
-            List<BundleInfo> unpcakList = PlayModeHelper.GetUnpackListByAll(ActiveManifest, BuildinFileSystem, DeliveryFileSystem, CacheFileSystem);
+            List<BundleInfo> unpcakList = PlayModeHelper.GetUnpackListByAll(ActiveManifest, BuildinFileSystem, CacheFileSystem);
             var operation = new ResourceUnpackerOperation(PackageName, unpcakList, upackingMaxNumber, failedTryAgain, timeout);
             return operation;
         }
         ResourceUnpackerOperation IPlayMode.CreateResourceUnpackerByTags(string[] tags, int upackingMaxNumber, int failedTryAgain, int timeout)
         {
-            List<BundleInfo> unpcakList = PlayModeHelper.GetUnpackListByTags(ActiveManifest, tags, BuildinFileSystem, DeliveryFileSystem, CacheFileSystem);
+            List<BundleInfo> unpcakList = PlayModeHelper.GetUnpackListByTags(ActiveManifest, tags, BuildinFileSystem, CacheFileSystem);
             var operation = new ResourceUnpackerOperation(PackageName, unpcakList, upackingMaxNumber, failedTryAgain, timeout);
             return operation;
         }
         ResourceImporterOperation IPlayMode.CreateResourceImporterByFilePaths(string[] filePaths, int importerMaxNumber, int failedTryAgain, int timeout)
         {
-            List<BundleInfo> importerList = PlayModeHelper.GetImporterListByFilePaths(ActiveManifest, filePaths, BuildinFileSystem, DeliveryFileSystem, CacheFileSystem);
+            List<BundleInfo> importerList = PlayModeHelper.GetImporterListByFilePaths(ActiveManifest, filePaths, BuildinFileSystem, CacheFileSystem);
             var operation = new ResourceImporterOperation(PackageName, importerList, importerMaxNumber, failedTryAgain, timeout);
             return operation;
         }
@@ -121,11 +117,6 @@ namespace YooAsset
             if (BuildinFileSystem != null && BuildinFileSystem.Belong(packageBundle))
             {
                 BundleInfo bundleInfo = new BundleInfo(BuildinFileSystem, packageBundle);
-                return bundleInfo;
-            }
-            if (DeliveryFileSystem != null && DeliveryFileSystem.Belong(packageBundle))
-            {
-                BundleInfo bundleInfo = new BundleInfo(DeliveryFileSystem, packageBundle);
                 return bundleInfo;
             }
             if (CacheFileSystem.Belong(packageBundle))
