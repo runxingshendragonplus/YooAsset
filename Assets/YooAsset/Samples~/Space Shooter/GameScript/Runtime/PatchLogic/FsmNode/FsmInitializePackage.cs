@@ -92,7 +92,7 @@ internal class FsmInitializePackage : IStateNode
             IRemoteServices remoteServices = new RemoteServices(defaultHostServer, fallbackHostServer);
             createParameters.WebFileSystemParameters = WechatFileSystemCreater.CreateWechatFileSystemParameters(remoteServices);
 #else
-            createParameters.WebFileSystemParameters = FileSystemParameters.CreateDefaultWebFileSystemParameters();
+            createParameters.WebServerFileSystemParameters = FileSystemParameters.CreateDefaultWebServerFileSystemParameters();
 #endif
             initializationOperation = package.InitializeAsync(createParameters);
         }
