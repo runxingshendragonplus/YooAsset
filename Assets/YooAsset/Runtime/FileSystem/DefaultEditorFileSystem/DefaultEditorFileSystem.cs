@@ -36,6 +36,17 @@ namespace YooAsset
             }
         }
 
+        #region 自定义参数
+        /// <summary>
+        /// 异步模拟加载最小帧数
+        /// </summary>
+        public int _asyncSimulateMinFrame = 1;
+
+        /// <summary>
+        /// 异步模拟加载最大帧数
+        /// </summary>
+        public int _asyncSimulateMaxFrame = 1;
+        #endregion
 
         public DefaultEditorFileSystem()
         {
@@ -86,7 +97,18 @@ namespace YooAsset
 
         public virtual void SetParameter(string name, object value)
         {
-            YooLogger.Warning($"Invalid parameter : {name}");
+            if (name == FileSystemParametersDefine.ASYNC_SIMULATE_MIN_FRAME)
+            {
+                _asyncSimulateMinFrame = (int)value;
+            }
+            else if (name == FileSystemParametersDefine.ASYNC_SIMULATE_MAX_FRAME)
+            {
+                _asyncSimulateMaxFrame = (int)value;
+            }
+            else
+            {
+                YooLogger.Warning($"Invalid parameter : {name}");
+            }
         }
         public virtual void OnCreate(string packageName, string rootDirectory)
         {
@@ -131,7 +153,7 @@ namespace YooAsset
         {
             throw new System.NotImplementedException();
         }
-        
+
         #region 内部方法
         public string GetEditorPackageVersionFilePath()
         {
@@ -147,6 +169,15 @@ namespace YooAsset
         {
             string fileName = YooAssetSettingsData.GetManifestBinaryFileName(PackageName, packageVersion);
             return PathUtility.Combine(FileRoot, fileName);
+        }
+        public int GetAsyncSimulateFrame()
+        {
+            if (_asyncSimulateMinFrame > _asyncSimulateMaxFrame)
+            {
+                _asyncSimulateMinFrame = _asyncSimulateMaxFrame;
+            }
+
+            return UnityEngine.Random.Range(_asyncSimulateMinFrame, _asyncSimulateMaxFrame + 1);
         }
         #endregion
     }
