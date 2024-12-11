@@ -177,17 +177,14 @@ namespace YooAsset
 #endif
             }
 
-            // 检测文件系统
+            // 检测文件系统参数
             if (_playMode == EPlayMode.WebPlayMode)
             {
-                var webPlayModeParam = parameters as WebPlayModeParameters;
-                if (webPlayModeParam != null)
-                {
-                    var fileSystemClassName = webPlayModeParam.WebFileSystemParameters.FileSystemClass;
-                    if (fileSystemClassName == typeof(DefaultCacheFileSystem).FullName
-                        || fileSystemClassName == typeof(DefaultBuildinFileSystem).FullName)
-                        throw new Exception($"{fileSystemClassName} not support {nameof(EPlayMode.WebPlayMode)}");
-                }
+                var webPlayModeParams = parameters as WebPlayModeParameters;
+                var fileSystemClassName = webPlayModeParams.WebFileSystemParameters.FileSystemClass;
+                if (fileSystemClassName == typeof(DefaultCacheFileSystem).FullName
+                    || fileSystemClassName == typeof(DefaultBuildinFileSystem).FullName)
+                    throw new Exception($"{fileSystemClassName} not support {nameof(EPlayMode.WebPlayMode)}");
             }
         }
         private void InitializeOperation_Completed(AsyncOperationBase op)
