@@ -5,16 +5,16 @@ namespace YooAsset
 {
     internal class DownloadHandlerAssetBundleOperation : DefaultDownloadFileOperation
     {
-        private readonly DefaultWebFileSystem _fileSystem;
+        private readonly bool _disableUnityWebCache;
         private DownloadHandlerAssetBundle _downloadhandler;
         private ESteps _steps = ESteps.None;
 
         public AssetBundle Result { private set; get; }
 
 
-        internal DownloadHandlerAssetBundleOperation(DefaultWebFileSystem fileSystem, PackageBundle bundle, DownloadParam param) : base(bundle, param)
+        internal DownloadHandlerAssetBundleOperation(bool disableUnityWebCache, PackageBundle bundle, DownloadParam param) : base(bundle, param)
         {
-            _fileSystem = fileSystem;
+            _disableUnityWebCache = disableUnityWebCache;
         }
         internal override void InternalOnStart()
         {
@@ -113,7 +113,7 @@ namespace YooAsset
         }
         private DownloadHandlerAssetBundle CreateDownloadHandler()
         {
-            if (_fileSystem.DisableUnityWebCache)
+            if (_disableUnityWebCache)
             {
                 var downloadhandler = new DownloadHandlerAssetBundle(_requestURL, 0);
 #if UNITY_2020_3_OR_NEWER

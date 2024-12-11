@@ -333,14 +333,18 @@ namespace YooAsset
         private enum ESteps
         {
             None,
-            CreateFileSystem,
-            InitWebFileSystem,
+            CreateWebServerFileSystem,
+            InitWebServerFileSystem,
+            CreateWebRemoteFileSystem,
+            InitWebRemoteFileSystem,
+            CheckResult,
             Done,
         }
 
         private readonly WebPlayModeImpl _impl;
         private readonly WebPlayModeParameters _parameters;
-        private FSInitializeFileSystemOperation _initWebFileSystemOp;
+        private FSInitializeFileSystemOperation _initWebServerFileSystemOp;
+        private FSInitializeFileSystemOperation _initWebRemoteFileSystemOp;
         private ESteps _steps = ESteps.None;
 
         internal WebPlayModeInitializationOperation(WebPlayModeImpl impl, WebPlayModeParameters parameters)
@@ -350,54 +354,107 @@ namespace YooAsset
         }
         internal override void InternalOnStart()
         {
-            _steps = ESteps.CreateFileSystem;
+            _steps = ESteps.CreateWebServerFileSystem;
         }
         internal override void InternalOnUpdate()
         {
             if (_steps == ESteps.None || _steps == ESteps.Done)
                 return;
 
-            if (_steps == ESteps.CreateFileSystem)
+            if (_steps == ESteps.CreateWebServerFileSystem)
             {
-                if (_parameters.WebFileSystemParameters == null)
+                if (_parameters.WebServerFileSystemParameters == null)
                 {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Failed;
-                    Error = "Web file system parameters is null";
+                    _steps = ESteps.CreateWebRemoteFileSystem;
                     return;
                 }
 
-                _impl.WebFileSystem = PlayModeHelper.CreateFileSystem(_impl.PackageName, _parameters.WebFileSystemParameters);
-                if (_impl.WebFileSystem == null)
+                _impl.WebServerFileSystem = PlayModeHelper.CreateFileSystem(_impl.PackageName, _parameters.WebServerFileSystemParameters);
+                if (_impl.WebServerFileSystem == null)
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = "Failed to create web file system";
+                    Error = "Failed to create web server file system";
                     return;
                 }
 
-                _steps = ESteps.InitWebFileSystem;
+                _steps = ESteps.InitWebServerFileSystem;
             }
 
-            if (_steps == ESteps.InitWebFileSystem)
+            if (_steps == ESteps.InitWebServerFileSystem)
             {
-                if (_initWebFileSystemOp == null)
-                    _initWebFileSystemOp = _impl.WebFileSystem.InitializeFileSystemAsync();
+                if (_initWebServerFileSystemOp == null)
+                    _initWebServerFileSystemOp = _impl.WebServerFileSystem.InitializeFileSystemAsync();
 
-                Progress = _initWebFileSystemOp.Progress;
-                if (_initWebFileSystemOp.IsDone == false)
+                Progress = _initWebServerFileSystemOp.Progress;
+                if (_initWebServerFileSystemOp.IsDone == false)
                     return;
 
-                if (_initWebFileSystemOp.Status == EOperationStatus.Succeed)
+                if (_initWebServerFileSystemOp.Status == EOperationStatus.Succeed)
                 {
-                    _steps = ESteps.Done;
-                    Status = EOperationStatus.Succeed;
+                    _steps = ESteps.CreateWebRemoteFileSystem;
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _initWebFileSystemOp.Error;
+                    Error = _initWebServerFileSystemOp.Error;
+                }
+            }
+
+            if (_steps == ESteps.CreateWebRemoteFileSystem)
+            {
+                if (_parameters.WebRemoteFileSystemParameters == null)
+                {
+                    _steps = ESteps.CheckResult;
+                    return;
+                }
+
+                _impl.WebRemoteFileSystem = PlayModeHelper.CreateFileSystem(_impl.PackageName, _parameters.WebRemoteFileSystemParameters);
+                if (_impl.WebRemoteFileSystem == null)
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Failed;
+                    Error = "Failed to create web remote file system";
+                    return;
+                }
+
+                _steps = ESteps.InitWebRemoteFileSystem;
+            }
+
+            if (_steps == ESteps.InitWebRemoteFileSystem)
+            {
+                if (_initWebRemoteFileSystemOp == null)
+                    _initWebRemoteFileSystemOp = _impl.WebServerFileSystem.InitializeFileSystemAsync();
+
+                Progress = _initWebRemoteFileSystemOp.Progress;
+                if (_initWebRemoteFileSystemOp.IsDone == false)
+                    return;
+
+                if (_initWebRemoteFileSystemOp.Status == EOperationStatus.Succeed)
+                {
+                    _steps = ESteps.CheckResult;
+                }
+                else
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Failed;
+                    Error = _initWebRemoteFileSystemOp.Error;
+                }
+            }
+
+            if (_steps == ESteps.CheckResult)
+            {
+                if(_impl.WebServerFileSystem == null && _impl.WebRemoteFileSystem == null)
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Failed;
+                    Error = "Not found any file system !";
+                }
+                else
+                {
+                    _steps = ESteps.Done;
+                    Status = EOperationStatus.Succeed;
                 }
             }
         }

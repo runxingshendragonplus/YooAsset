@@ -1,7 +1,7 @@
 ﻿
 namespace YooAsset
 {
-    internal class RequestWebPackageHashOperation : AsyncOperationBase
+    internal class RequestWebRemotePackageHashOperation : AsyncOperationBase
     {
         private enum ESteps
         {
@@ -10,10 +10,11 @@ namespace YooAsset
             Done,
         }
 
-        private readonly DefaultWebFileSystem _fileSystem;
+        private readonly DefaultWebRemoteFileSystem _fileSystem;
         private readonly string _packageVersion;
         private readonly int _timeout;
         private UnityWebTextRequestOperation _webTextRequestOp;
+        private int _requestCount = 0;
         private ESteps _steps = ESteps.None;
 
         /// <summary>
@@ -22,7 +23,7 @@ namespace YooAsset
         public string PackageHash { private set; get; }
 
 
-        public RequestWebPackageHashOperation(DefaultWebFileSystem fileSystem, string packageVersion, int timeout)
+        public RequestWebRemotePackageHashOperation(DefaultWebRemoteFileSystem fileSystem, string packageVersion, int timeout)
         {
             _fileSystem = fileSystem;
             _packageVersion = packageVersion;
@@ -30,6 +31,7 @@ namespace YooAsset
         }
         internal override void InternalOnStart()
         {
+            _requestCount = WebRequestCounter.GetRequestFailedCount(_fileSystem.PackageName, nameof(RequestWebRemotePackageHashOperation));
             _steps = ESteps.RequestPackageHash;
         }
         internal override void InternalOnUpdate()
@@ -41,8 +43,8 @@ namespace YooAsset
             {
                 if (_webTextRequestOp == null)
                 {
-                    string filePath = _fileSystem.GetWebPackageHashFilePath(_packageVersion);
-                    string url = DownloadSystemHelper.ConvertToWWWPath(filePath);
+                    string fileName = YooAssetSettingsData.GetPackageHashFileName(_fileSystem.PackageName, _packageVersion);
+                    string url = GetWebRequestURL(fileName);
                     _webTextRequestOp = new UnityWebTextRequestOperation(url, _timeout);
                     OperationSystem.StartOperation(_fileSystem.PackageName, _webTextRequestOp);
                 }
@@ -58,7 +60,7 @@ namespace YooAsset
                     {
                         _steps = ESteps.Done;
                         Status = EOperationStatus.Failed;
-                        Error = $"Web package hash file content is empty !";
+                        Error = $"Web remote package hash file content is empty !";
                     }
                     else
                     {
@@ -71,8 +73,18 @@ namespace YooAsset
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
                     Error = _webTextRequestOp.Error;
+                    WebRequestCounter.RecordRequestFailed(_fileSystem.PackageName, nameof(RequestWebRemotePackageHashOperation));
                 }
             }
+        }
+
+        private string GetWebRequestURL(string fileName)
+        {
+            // 轮流返回请求地址
+            if (_requestCount % 2 == 0)
+                return _fileSystem.RemoteServices.GetRemoteMainURL(fileName);
+            else
+                return _fileSystem.RemoteServices.GetRemoteFallbackURL(fileName);
         }
     }
 }

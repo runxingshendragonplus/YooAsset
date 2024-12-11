@@ -170,7 +170,7 @@ namespace YooAsset
         /// <param name="disableUnityWebCache">禁用Unity的网络缓存</param>
         public static FileSystemParameters CreateDefaultWebFileSystemParameters(bool disableUnityWebCache = false)
         {
-            string fileSystemClass = typeof(DefaultWebFileSystem).FullName;
+            string fileSystemClass = typeof(DefaultWebServerFileSystem).FullName;
             var fileSystemParams = new FileSystemParameters(fileSystemClass, null);
             fileSystemParams.AddParameter(FileSystemParametersDefine.DISABLE_UNITY_WEB_CACHE, disableUnityWebCache);
             return fileSystemParams;
@@ -215,6 +215,7 @@ namespace YooAsset
     /// </summary>
     public class WebPlayModeParameters : InitializeParameters
     {
-        public FileSystemParameters WebFileSystemParameters;
+        public FileSystemParameters WebServerFileSystemParameters;
+        public FileSystemParameters WebRemoteFileSystemParameters;
     }
 }

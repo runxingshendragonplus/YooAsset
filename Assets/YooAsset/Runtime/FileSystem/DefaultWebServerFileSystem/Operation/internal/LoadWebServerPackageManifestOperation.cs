@@ -1,7 +1,7 @@
 ﻿
 namespace YooAsset
 {
-    internal class LoadWebPackageManifestOperation : AsyncOperationBase
+    internal class LoadWebServerPackageManifestOperation : AsyncOperationBase
     {
         private enum ESteps
         {
@@ -12,7 +12,7 @@ namespace YooAsset
             Done,
         }
 
-        private readonly DefaultWebFileSystem _fileSystem;
+        private readonly DefaultWebServerFileSystem _fileSystem;
         private readonly string _packageVersion;
         private readonly string _packageHash;
         private UnityWebDataRequestOperation _webDataRequestOp;
@@ -25,7 +25,7 @@ namespace YooAsset
         public PackageManifest Manifest { private set; get; }
 
 
-        internal LoadWebPackageManifestOperation(DefaultWebFileSystem fileSystem, string packageVersion, string packageHash)
+        internal LoadWebServerPackageManifestOperation(DefaultWebServerFileSystem fileSystem, string packageVersion, string packageHash)
         {
             _fileSystem = fileSystem;
             _packageVersion = packageVersion;
@@ -76,7 +76,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = "Failed to verify web package manifest file!";
+                    Error = "Failed to verify web server package manifest file!";
                 }
             }
 

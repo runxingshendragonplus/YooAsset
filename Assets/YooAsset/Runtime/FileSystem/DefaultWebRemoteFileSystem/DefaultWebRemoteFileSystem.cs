@@ -8,22 +8,8 @@ namespace YooAsset
     /// <summary>
     /// Web文件系统
     /// </summary>
-    internal class DefaultWebFileSystem : IFileSystem
+    internal class DefaultWebRemoteFileSystem : IFileSystem
     {
-        public class FileWrapper
-        {
-            public string FileName { private set; get; }
-
-            public FileWrapper(string fileName)
-            {
-                FileName = fileName;
-            }
-        }
-
-        protected readonly Dictionary<string, FileWrapper> _wrappers = new Dictionary<string, FileWrapper>(10000);
-        protected readonly Dictionary<string, string> _webFilePaths = new Dictionary<string, string>(10000);
-        protected string _webPackageRoot = string.Empty;
-
         /// <summary>
         /// 包裹名称
         /// </summary>
@@ -36,7 +22,7 @@ namespace YooAsset
         {
             get
             {
-                return _webPackageRoot;
+                return string.Empty;
             }
         }
 
@@ -56,27 +42,32 @@ namespace YooAsset
         /// 禁用Unity的网络缓存
         /// </summary>
         public bool DisableUnityWebCache { private set; get; } = false;
+
+        /// <summary>
+        /// 自定义参数：跨域下载服务接口
+        /// </summary>
+        public IRemoteServices RemoteServices { private set; get; } = null;
         #endregion
 
 
-        public DefaultWebFileSystem()
+        public DefaultWebRemoteFileSystem()
         {
         }
         public virtual FSInitializeFileSystemOperation InitializeFileSystemAsync()
         {
-            var operation = new DWFSInitializeOperation(this);
+            var operation = new DWRFSInitializeOperation(this);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
         public virtual FSLoadPackageManifestOperation LoadPackageManifestAsync(string packageVersion, int timeout)
         {
-            var operation = new DWFSLoadPackageManifestOperation(this, timeout);
+            var operation = new DWRFSLoadPackageManifestOperation(this, packageVersion, timeout);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
         public virtual FSRequestPackageVersionOperation RequestPackageVersionAsync(bool appendTimeTicks, int timeout)
         {
-            var operation = new DWFSRequestPackageVersionOperation(this, timeout);
+            var operation = new DWRFSRequestPackageVersionOperation(this, appendTimeTicks, timeout);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
@@ -98,7 +89,7 @@ namespace YooAsset
         }
         public virtual FSLoadBundleOperation LoadBundleFile(PackageBundle bundle)
         {
-            var operation = new DWFSLoadAssetBundleOperation(this, bundle);
+            var operation = new DWRFSLoadAssetBundleOperation(this, bundle);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
@@ -118,6 +109,10 @@ namespace YooAsset
             {
                 DisableUnityWebCache = (bool)value;
             }
+            else if (name == FileSystemParametersDefine.REMOTE_SERVICES)
+            {
+                RemoteServices = (IRemoteServices)value;
+            }
             else
             {
                 YooLogger.Warning($"Invalid parameter : {name}");
@@ -126,11 +121,6 @@ namespace YooAsset
         public virtual void OnCreate(string packageName, string rootDirectory)
         {
             PackageName = packageName;
-
-            if (string.IsNullOrEmpty(rootDirectory))
-                rootDirectory = GetDefaultWebRoot();
-
-            _webPackageRoot = PathUtility.Combine(rootDirectory, packageName);
         }
         public virtual void OnUpdate()
         {
@@ -167,60 +157,6 @@ namespace YooAsset
         }
 
         #region 内部方法
-        protected string GetDefaultWebRoot()
-        {
-            string path = PathUtility.Combine(UnityEngine.Application.streamingAssetsPath, YooAssetSettingsData.Setting.DefaultYooFolderName);
-            return path;
-        }
-        public string GetWebFileLoadPath(PackageBundle bundle)
-        {
-            if (_webFilePaths.TryGetValue(bundle.BundleGUID, out string filePath) == false)
-            {
-                filePath = PathUtility.Combine(_webPackageRoot, bundle.FileName);
-                _webFilePaths.Add(bundle.BundleGUID, filePath);
-            }
-            return filePath;
-        }
-        public string GetCatalogFileLoadPath()
-        {
-            string fileName = Path.GetFileNameWithoutExtension(DefaultBuildinFileSystemDefine.BuildinCatalogFileName);
-            return PathUtility.Combine(YooAssetSettingsData.Setting.DefaultYooFolderName, PackageName, fileName);
-        }
-        public string GetWebPackageVersionFilePath()
-        {
-            string fileName = YooAssetSettingsData.GetPackageVersionFileName(PackageName);
-            return PathUtility.Combine(FileRoot, fileName);
-        }
-        public string GetWebPackageHashFilePath(string packageVersion)
-        {
-            string fileName = YooAssetSettingsData.GetPackageHashFileName(PackageName, packageVersion);
-            return PathUtility.Combine(FileRoot, fileName);
-        }
-        public string GetWebPackageManifestFilePath(string packageVersion)
-        {
-            string fileName = YooAssetSettingsData.GetManifestBinaryFileName(PackageName, packageVersion);
-            return PathUtility.Combine(FileRoot, fileName);
-        }
-        public string GetStreamingAssetsPackageRoot()
-        {
-            string rootPath = PathUtility.Combine(Application.dataPath, "StreamingAssets", YooAssetSettingsData.Setting.DefaultYooFolderName);
-            return PathUtility.Combine(rootPath, PackageName);
-        }
-
-        /// <summary>
-        /// 记录文件信息
-        /// </summary>
-        public bool RecordFile(string bundleGUID, FileWrapper wrapper)
-        {
-            if (_wrappers.ContainsKey(bundleGUID))
-            {
-                YooLogger.Error($"{nameof(DefaultWebFileSystem)} has element : {bundleGUID}");
-                return false;
-            }
-
-            _wrappers.Add(bundleGUID, wrapper);
-            return true;
-        }
         #endregion
     }
 }

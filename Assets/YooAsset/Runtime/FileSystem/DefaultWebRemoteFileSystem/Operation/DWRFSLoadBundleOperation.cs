@@ -1,7 +1,7 @@
 ﻿
 namespace YooAsset
 {
-    internal class DWFSLoadAssetBundleOperation : FSLoadBundleOperation
+    internal class DWRFSLoadAssetBundleOperation : FSLoadBundleOperation
     {
         private enum ESteps
         {
@@ -10,13 +10,13 @@ namespace YooAsset
             Done,
         }
 
-        private readonly DefaultWebFileSystem _fileSystem;
+        private readonly DefaultWebRemoteFileSystem _fileSystem;
         private readonly PackageBundle _bundle;
         private DownloadHandlerAssetBundleOperation _downloadhanlderAssetBundleOp;
         private ESteps _steps = ESteps.None;
 
 
-        internal DWFSLoadAssetBundleOperation(DefaultWebFileSystem fileSystem, PackageBundle bundle)
+        internal DWRFSLoadAssetBundleOperation(DefaultWebRemoteFileSystem fileSystem, PackageBundle bundle)
         {
             _fileSystem = fileSystem;
             _bundle = bundle;
@@ -35,10 +35,9 @@ namespace YooAsset
                 if (_downloadhanlderAssetBundleOp == null)
                 {
                     DownloadParam downloadParam = new DownloadParam(int.MaxValue, 60);
-                    string fileLoadPath = _fileSystem.GetWebFileLoadPath(_bundle);
-                    downloadParam.MainURL = DownloadSystemHelper.ConvertToWWWPath(fileLoadPath);
-                    downloadParam.FallbackURL = downloadParam.MainURL;
-                    _downloadhanlderAssetBundleOp = new DownloadHandlerAssetBundleOperation(_fileSystem, _bundle, downloadParam);
+                    downloadParam.MainURL = _fileSystem.RemoteServices.GetRemoteMainURL(_bundle.FileName);
+                    downloadParam.FallbackURL = _fileSystem.RemoteServices.GetRemoteFallbackURL(_bundle.FileName);
+                    _downloadhanlderAssetBundleOp = new DownloadHandlerAssetBundleOperation(_fileSystem.DisableUnityWebCache, _bundle, downloadParam);
                     OperationSystem.StartOperation(_fileSystem.PackageName, _downloadhanlderAssetBundleOp);
                 }
 

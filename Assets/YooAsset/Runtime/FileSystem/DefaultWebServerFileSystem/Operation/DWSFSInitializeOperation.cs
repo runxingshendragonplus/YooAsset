@@ -1,7 +1,7 @@
 ﻿
 namespace YooAsset
 {
-    internal class DWFSInitializeOperation : FSInitializeFileSystemOperation
+    internal class DWSFSInitializeOperation : FSInitializeFileSystemOperation
     {
         private enum ESteps
         {
@@ -10,12 +10,12 @@ namespace YooAsset
             Done,
         }
 
-        private readonly DefaultWebFileSystem _fileSystem;
-        private LoadWebCatalogFileOperation _loadCatalogFileOp;
+        private readonly DefaultWebServerFileSystem _fileSystem;
+        private LoadWebServerCatalogFileOperation _loadCatalogFileOp;
         private ESteps _steps = ESteps.None;
 
 
-        public DWFSInitializeOperation(DefaultWebFileSystem fileSystem)
+        public DWSFSInitializeOperation(DefaultWebServerFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
         }
@@ -39,7 +39,7 @@ namespace YooAsset
                     DefaultBuildinFileSystemBuild.CreateBuildinCatalogFile(_fileSystem.PackageName, packageRoot);
 #endif
 
-                    _loadCatalogFileOp = new LoadWebCatalogFileOperation(_fileSystem);
+                    _loadCatalogFileOp = new LoadWebServerCatalogFileOperation(_fileSystem);
                     OperationSystem.StartOperation(_fileSystem.PackageName, _loadCatalogFileOp);
                 }
 

@@ -1,7 +1,7 @@
 ﻿
 namespace YooAsset
 {
-    internal class DWFSRequestPackageVersionOperation : FSRequestPackageVersionOperation
+    internal class DWRFSRequestPackageVersionOperation : FSRequestPackageVersionOperation
     {
         private enum ESteps
         {
@@ -10,15 +10,17 @@ namespace YooAsset
             Done,
         }
 
-        private readonly DefaultWebFileSystem _fileSystem;
+        private readonly DefaultWebRemoteFileSystem _fileSystem;
+        private readonly bool _appendTimeTicks;
         private readonly int _timeout;
-        private RequestWebPackageVersionOperation _requestWebPackageVersionOp;
+        private RequestWebRemotePackageVersionOperation _requestWebPackageVersionOp;
         private ESteps _steps = ESteps.None;
 
 
-        internal DWFSRequestPackageVersionOperation(DefaultWebFileSystem fileSystem, int timeout)
+        internal DWRFSRequestPackageVersionOperation(DefaultWebRemoteFileSystem fileSystem, bool appendTimeTicks, int timeout)
         {
             _fileSystem = fileSystem;
+            _appendTimeTicks = appendTimeTicks;
             _timeout = timeout;
         }
         internal override void InternalOnStart()
@@ -34,7 +36,7 @@ namespace YooAsset
             {
                 if (_requestWebPackageVersionOp == null)
                 {
-                    _requestWebPackageVersionOp = new RequestWebPackageVersionOperation(_fileSystem, _timeout);
+                    _requestWebPackageVersionOp = new RequestWebRemotePackageVersionOperation(_fileSystem, _appendTimeTicks, _timeout);
                     OperationSystem.StartOperation(_fileSystem.PackageName, _requestWebPackageVersionOp);
                 }
 

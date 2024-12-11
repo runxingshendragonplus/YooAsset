@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace YooAsset
 {
-    internal sealed class LoadWebCatalogFileOperation : AsyncOperationBase
+    internal sealed class LoadWebServerCatalogFileOperation : AsyncOperationBase
     {
         private enum ESteps
         {
@@ -15,7 +15,7 @@ namespace YooAsset
             Done,
         }
 
-        private readonly DefaultWebFileSystem _fileSystem;
+        private readonly DefaultWebServerFileSystem _fileSystem;
         private ESteps _steps = ESteps.None;
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace YooAsset
         /// </summary>
         public string PackageVersion { private set; get; }
 
-        internal LoadWebCatalogFileOperation(DefaultWebFileSystem fileSystem)
+        internal LoadWebServerCatalogFileOperation(DefaultWebServerFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
         }
@@ -44,7 +44,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = $"Failed to load web catalog file : {catalogFilePath}";
+                    Error = $"Failed to load web server catalog file : {catalogFilePath}";
                     return;
                 }
 
@@ -52,14 +52,14 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = $"Web catalog file package name {catalog.PackageName} cannot match the file system package name {_fileSystem.PackageName}";
+                    Error = $"Web server catalog file package name {catalog.PackageName} cannot match the file system package name {_fileSystem.PackageName}";
                     return;
                 }
 
                 PackageVersion = catalog.PackageVersion;
                 foreach (var wrapper in catalog.Wrappers)
                 {
-                    var fileWrapper = new DefaultWebFileSystem.FileWrapper(wrapper.FileName);
+                    var fileWrapper = new DefaultWebServerFileSystem.FileWrapper(wrapper.FileName);
                     _fileSystem.RecordFile(wrapper.BundleGUID, fileWrapper);
                 }
 
