@@ -272,6 +272,15 @@ namespace YooAsset
             return _playModeImpl.ActiveManifest.PackageVersion;
         }
 
+        /// <summary>
+        /// 获取本地包裹的备注信息
+        /// </summary>
+        public string GetPackageNote()
+        {
+            DebugCheckInitialize();
+            return _playModeImpl.ActiveManifest.PackageNote;
+        }
+
         #region 资源回收
         /// <summary>
         /// 强制回收所有资源

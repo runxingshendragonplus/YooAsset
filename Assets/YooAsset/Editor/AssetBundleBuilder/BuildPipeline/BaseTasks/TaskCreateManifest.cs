@@ -35,6 +35,7 @@ namespace YooAsset.Editor
             manifest.BuildPipeline = buildParameters.BuildPipeline;
             manifest.PackageName = buildParameters.PackageName;
             manifest.PackageVersion = buildParameters.PackageVersion;
+            manifest.PackageNote = buildParameters.PackageNote;
             manifest.BundleList = GetAllPackageBundle(buildMapContext);
             manifest.AssetList = GetAllPackageAsset(buildMapContext);
 

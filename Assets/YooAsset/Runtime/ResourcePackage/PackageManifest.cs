@@ -53,6 +53,11 @@ namespace YooAsset
         public string PackageVersion;
 
         /// <summary>
+        /// 资源包裹的备注信息
+        /// </summary>
+        public string PackageNote;
+
+        /// <summary>
         /// 资源列表（主动收集的资源列表）
         /// </summary>
         public List<PackageAsset> AssetList = new List<PackageAsset>();
