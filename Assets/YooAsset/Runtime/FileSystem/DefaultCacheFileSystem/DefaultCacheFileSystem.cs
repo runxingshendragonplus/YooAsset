@@ -12,13 +12,14 @@ namespace YooAsset
     /// </summary>
     internal class DefaultCacheFileSystem : IFileSystem, ICacheSystem
     {
-        protected readonly Dictionary<string, DefaultDownloadFileOperation> _downloaders = new Dictionary<string, DefaultDownloadFileOperation>(1000);
         protected readonly Dictionary<string, CacheWrapper> _wrappers = new Dictionary<string, CacheWrapper>(10000);
         protected readonly Dictionary<string, Stream> _loadedStream = new Dictionary<string, Stream>(10000);
         protected readonly Dictionary<string, string> _dataFilePaths = new Dictionary<string, string>(10000);
         protected readonly Dictionary<string, string> _infoFilePaths = new Dictionary<string, string>(10000);
         protected readonly Dictionary<string, string> _tempFilePaths = new Dictionary<string, string>(10000);
+        protected readonly Dictionary<string, DefaultDownloadFileOperation> _downloaders = new Dictionary<string, DefaultDownloadFileOperation>(1000);
         protected readonly List<string> _removeList = new List<string>(1000);
+
         protected string _packageRoot;
         protected string _cacheFileRoot;
         protected string _tempFileRoot;
@@ -147,7 +148,7 @@ namespace YooAsset
 
                 if (bundle.FileSize >= ResumeDownloadMinimumSize)
                 {
-                    var newDownloader = new DCFSDownloadResumeFileOperation(this, bundle, param);
+                    var newDownloader = new DownloadResumeFileOperation(this, this, bundle, param, ResumeDownloadResponseCodes);
                     newDownloader.Reference();
                     _downloaders.Add(bundle.BundleGUID, newDownloader);
                     OperationSystem.StartOperation(PackageName, newDownloader);
@@ -155,7 +156,7 @@ namespace YooAsset
                 }
                 else
                 {
-                    var newDownloader = new DCFSDownloadNormalFileOperation(this, bundle, param);
+                    var newDownloader = new DownloadNormalFileOperation(this, this, bundle, param);
                     newDownloader.Reference();
                     _downloaders.Add(bundle.BundleGUID, newDownloader);
                     OperationSystem.StartOperation(PackageName, newDownloader);
@@ -361,6 +362,37 @@ namespace YooAsset
         {
             return _cacheFileRoot;
         }
+        public string GetTempFilePath(PackageBundle bundle)
+        {
+            if (_tempFilePaths.TryGetValue(bundle.BundleGUID, out string filePath) == false)
+            {
+                filePath = PathUtility.Combine(_tempFileRoot, bundle.BundleGUID);
+                _tempFilePaths.Add(bundle.BundleGUID, filePath);
+            }
+            return filePath;
+        }
+        public string GetDataFilePath(PackageBundle bundle)
+        {
+            if (_dataFilePaths.TryGetValue(bundle.BundleGUID, out string filePath) == false)
+            {
+                string folderName = bundle.FileHash.Substring(0, 2);
+                filePath = PathUtility.Combine(_cacheFileRoot, folderName, bundle.BundleGUID, DefaultCacheFileSystemDefine.SaveBundleDataFileName);
+                if (AppendFileExtension)
+                    filePath += bundle.FileExtension;
+                _dataFilePaths.Add(bundle.BundleGUID, filePath);
+            }
+            return filePath;
+        }
+        public string GetInfoFilePath(PackageBundle bundle)
+        {
+            if (_infoFilePaths.TryGetValue(bundle.BundleGUID, out string filePath) == false)
+            {
+                string folderName = bundle.FileHash.Substring(0, 2);
+                filePath = PathUtility.Combine(_cacheFileRoot, folderName, bundle.BundleGUID, DefaultCacheFileSystemDefine.SaveBundleInfoFileName);
+                _infoFilePaths.Add(bundle.BundleGUID, filePath);
+            }
+            return filePath;
+        }
         public List<string> GetAllCachedBundleGUIDs()
         {
             return _wrappers.Keys.ToList();
@@ -472,37 +504,6 @@ namespace YooAsset
         #endregion
 
         #region 内部方法
-        protected string GetDataFilePath(PackageBundle bundle)
-        {
-            if (_dataFilePaths.TryGetValue(bundle.BundleGUID, out string filePath) == false)
-            {
-                string folderName = bundle.FileHash.Substring(0, 2);
-                filePath = PathUtility.Combine(_cacheFileRoot, folderName, bundle.BundleGUID, DefaultCacheFileSystemDefine.SaveBundleDataFileName);
-                if (AppendFileExtension)
-                    filePath += bundle.FileExtension;
-                _dataFilePaths.Add(bundle.BundleGUID, filePath);
-            }
-            return filePath;
-        }
-        protected string GetInfoFilePath(PackageBundle bundle)
-        {
-            if (_infoFilePaths.TryGetValue(bundle.BundleGUID, out string filePath) == false)
-            {
-                string folderName = bundle.FileHash.Substring(0, 2);
-                filePath = PathUtility.Combine(_cacheFileRoot, folderName, bundle.BundleGUID, DefaultCacheFileSystemDefine.SaveBundleInfoFileName);
-                _infoFilePaths.Add(bundle.BundleGUID, filePath);
-            }
-            return filePath;
-        }
-        public string GetTempFilePath(PackageBundle bundle)
-        {
-            if (_tempFilePaths.TryGetValue(bundle.BundleGUID, out string filePath) == false)
-            {
-                filePath = PathUtility.Combine(_tempFileRoot, bundle.BundleGUID);
-                _tempFilePaths.Add(bundle.BundleGUID, filePath);
-            }
-            return filePath;
-        }
         public string GetCacheFileLoadPath(PackageBundle bundle)
         {
             return GetDataFilePath(bundle);

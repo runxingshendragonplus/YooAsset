@@ -10,6 +10,21 @@ namespace YooAsset
         string GetCacheFileRoot();
 
         /// <summary>
+        /// 获取临时缓存文件路径
+        /// </summary>
+        string GetTempFilePath(PackageBundle bundle);
+
+        /// <summary>
+        /// 获取数据文件路径
+        /// </summary>
+        string GetDataFilePath(PackageBundle bundle);
+
+        /// <summary>
+        /// 获取信息文件路径
+        /// </summary>
+        string GetInfoFilePath(PackageBundle bundle);
+
+        /// <summary>
         /// 获取所有缓存文件的GUID
         /// </summary>
         List<string> GetAllCachedBundleGUIDs();
