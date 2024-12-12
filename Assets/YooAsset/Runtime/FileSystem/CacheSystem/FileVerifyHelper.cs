@@ -3,7 +3,7 @@ using System.IO;
 
 namespace YooAsset
 {
-    internal class FileSystemHelper
+    internal class FileVerifyHelper
     {
         /// <summary>
         /// 文件校验

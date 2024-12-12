@@ -84,7 +84,7 @@ namespace YooAsset
         private void VerifyInThread(object obj)
         {
             TempFileElement element = (TempFileElement)obj;
-            int result = (int)FileSystemHelper.FileVerify(element.TempFilePath, element.TempFileSize, element.TempFileCRC, EFileVerifyLevel.High);
+            int result = (int)FileVerifyHelper.FileVerify(element.TempFilePath, element.TempFileSize, element.TempFileCRC, EFileVerifyLevel.High);
             element.Result = result;
         }
     }

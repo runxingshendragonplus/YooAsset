@@ -20,7 +20,7 @@ namespace YooAsset
         protected readonly Dictionary<string, string> _tempFilePaths = new Dictionary<string, string>(10000);
         protected readonly List<string> _removeList = new List<string>(1000);
         protected string _packageRoot;
-        protected string _saveFileRoot;
+        protected string _cacheFileRoot;
         protected string _tempFileRoot;
         protected string _manifestFileRoot;
 
@@ -238,10 +238,10 @@ namespace YooAsset
             PackageName = packageName;
 
             if (string.IsNullOrEmpty(rootDirectory))
-                rootDirectory = GetDefaultRoot();
+                rootDirectory = CacheHelper.GetDefaultCacheRoot();
 
             _packageRoot = PathUtility.Combine(rootDirectory, packageName);
-            _saveFileRoot = PathUtility.Combine(_packageRoot, DefaultCacheFileSystemDefine.SaveFilesFolderName);
+            _cacheFileRoot = PathUtility.Combine(_packageRoot, DefaultCacheFileSystemDefine.SaveFilesFolderName);
             _tempFileRoot = PathUtility.Combine(_packageRoot, DefaultCacheFileSystemDefine.TempFilesFolderName);
             _manifestFileRoot = PathUtility.Combine(_packageRoot, DefaultCacheFileSystemDefine.ManifestFilesFolderName);
         }
@@ -359,7 +359,7 @@ namespace YooAsset
         #region 缓存系统
         public string GetCacheFileRoot()
         {
-            return _saveFileRoot;
+            return _cacheFileRoot;
         }
         public List<string> GetAllCachedBundleGUIDs()
         {
@@ -387,7 +387,7 @@ namespace YooAsset
             if (_wrappers.TryGetValue(bundle.BundleGUID, out CacheWrapper wrapper) == false)
                 return EFileVerifyResult.CacheNotFound;
 
-            EFileVerifyResult result = FileSystemHelper.FileVerify(wrapper.DataFilePath, wrapper.DataFileSize, wrapper.DataFileCRC, EFileVerifyLevel.High);
+            EFileVerifyResult result = FileVerifyHelper.FileVerify(wrapper.DataFilePath, wrapper.DataFileSize, wrapper.DataFileCRC, EFileVerifyLevel.High);
             return result;
         }
         public bool WriteCacheFile(PackageBundle bundle, string copyPath)
@@ -472,25 +472,12 @@ namespace YooAsset
         #endregion
 
         #region 内部方法
-        protected string GetDefaultRoot()
-        {
-#if UNITY_EDITOR
-            // 注意：为了方便调试查看，编辑器下把存储目录放到项目里。
-            string projectPath = Path.GetDirectoryName(UnityEngine.Application.dataPath);
-            projectPath = PathUtility.RegularPath(projectPath);
-            return PathUtility.Combine(projectPath, YooAssetSettingsData.Setting.DefaultYooFolderName);
-#elif UNITY_STANDALONE
-            return PathUtility.Combine(UnityEngine.Application.dataPath, YooAssetSettingsData.Setting.DefaultYooFolderName);
-#else
-            return PathUtility.Combine(UnityEngine.Application.persistentDataPath, YooAssetSettingsData.Setting.DefaultYooFolderName);	
-#endif
-        }
         protected string GetDataFilePath(PackageBundle bundle)
         {
             if (_dataFilePaths.TryGetValue(bundle.BundleGUID, out string filePath) == false)
             {
                 string folderName = bundle.FileHash.Substring(0, 2);
-                filePath = PathUtility.Combine(_saveFileRoot, folderName, bundle.BundleGUID, DefaultCacheFileSystemDefine.SaveBundleDataFileName);
+                filePath = PathUtility.Combine(_cacheFileRoot, folderName, bundle.BundleGUID, DefaultCacheFileSystemDefine.SaveBundleDataFileName);
                 if (AppendFileExtension)
                     filePath += bundle.FileExtension;
                 _dataFilePaths.Add(bundle.BundleGUID, filePath);
@@ -502,7 +489,7 @@ namespace YooAsset
             if (_infoFilePaths.TryGetValue(bundle.BundleGUID, out string filePath) == false)
             {
                 string folderName = bundle.FileHash.Substring(0, 2);
-                filePath = PathUtility.Combine(_saveFileRoot, folderName, bundle.BundleGUID, DefaultCacheFileSystemDefine.SaveBundleInfoFileName);
+                filePath = PathUtility.Combine(_cacheFileRoot, folderName, bundle.BundleGUID, DefaultCacheFileSystemDefine.SaveBundleInfoFileName);
                 _infoFilePaths.Add(bundle.BundleGUID, filePath);
             }
             return filePath;

@@ -165,7 +165,7 @@ namespace YooAsset
                 return EFileVerifyResult.Exception;
             }
 
-            return FileSystemHelper.FileVerify(element.DataFilePath, element.DataFileSize, element.DataFileCRC, verifyLevel);
+            return FileVerifyHelper.FileVerify(element.DataFilePath, element.DataFileSize, element.DataFileCRC, verifyLevel);
         }
     }
 }
