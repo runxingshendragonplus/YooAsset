@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace YooAsset
 {
-    internal sealed class DCFSClearUnusedBundleFilesOperation : FSClearUnusedBundleFilesOperation
+    internal sealed class ClearUnusedCacheFilesOperation : FSClearUnusedBundleFilesOperation
     {
         private enum ESteps
         {
@@ -13,16 +13,16 @@ namespace YooAsset
             Done,
         }
 
-        private readonly DefaultCacheFileSystem _fileSystem;
+        private readonly ICacheSystem _cacheSystem;
         private readonly PackageManifest _manifest;
         private List<string> _unusedBundleGUIDs;
         private int _unusedFileTotalCount = 0;
         private ESteps _steps = ESteps.None;
 
-
-        internal DCFSClearUnusedBundleFilesOperation(DefaultCacheFileSystem fileSystem, PackageManifest manifest)
+        
+        internal ClearUnusedCacheFilesOperation(ICacheSystem cacheSystem, PackageManifest manifest)
         {
-            _fileSystem = fileSystem;
+            _cacheSystem = cacheSystem;
             _manifest = manifest;
         }
         internal override void InternalOnStart()
@@ -47,7 +47,7 @@ namespace YooAsset
                 for (int i = _unusedBundleGUIDs.Count - 1; i >= 0; i--)
                 {
                     string bundleGUID = _unusedBundleGUIDs[i];
-                    _fileSystem.DeleteCacheFile(bundleGUID);
+                    _cacheSystem.DeleteCacheFile(bundleGUID);
                     _unusedBundleGUIDs.RemoveAt(i);
                     if (OperationSystem.IsBusy)
                         break;
@@ -68,7 +68,7 @@ namespace YooAsset
 
         private List<string> GetUnusedBundleGUIDs()
         {
-            var allBundleGUIDs = _fileSystem.GetAllCachedBundleGUIDs();
+            var allBundleGUIDs = _cacheSystem.GetAllCachedBundleGUIDs();
             List<string> result = new List<string>(allBundleGUIDs.Count);
             foreach (var bundleGUID in allBundleGUIDs)
             {

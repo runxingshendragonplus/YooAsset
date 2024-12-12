@@ -6,44 +6,10 @@ using System.Threading;
 
 namespace YooAsset
 {
-    internal class CacheFileElement
-    {
-        public string PackageName { private set; get; }
-        public string BundleGUID { private set; get; }
-        public string FileRootPath { private set; get; }
-        public string DataFilePath { private set; get; }
-        public string InfoFilePath { private set; get; }
-
-        public EFileVerifyResult Result;
-        public string DataFileCRC;
-        public long DataFileSize;
-
-        public CacheFileElement(string packageName, string bundleGUID, string fileRootPath, string dataFilePath, string infoFilePath)
-        {
-            PackageName = packageName;
-            BundleGUID = bundleGUID;
-            FileRootPath = fileRootPath;
-            DataFilePath = dataFilePath;
-            InfoFilePath = infoFilePath;
-        }
-
-        public void DeleteFiles()
-        {
-            try
-            {
-                Directory.Delete(FileRootPath, true);
-            }
-            catch (System.Exception e)
-            {
-                YooLogger.Warning($"Failed to delete cache bundle folder : {e}");
-            }
-        }
-    }
-
     /// <summary>
     /// 缓存文件验证（线程版）
     /// </summary>
-    internal class VerifyCacheFilesOperation : AsyncOperationBase
+    internal sealed class VerifyCacheFilesOperation : AsyncOperationBase
     {
         private enum ESteps
         {
@@ -54,10 +20,10 @@ namespace YooAsset
         }
 
         private readonly ThreadSyncContext _syncContext = new ThreadSyncContext();
-        private readonly DefaultCacheFileSystem _fileSystem;
+        private readonly ICacheSystem _cacheSystem;
+        private readonly EFileVerifyLevel _verifyLevel;
         private List<CacheFileElement> _waitingList;
         private List<CacheFileElement> _verifyingList;
-        private EFileVerifyLevel _verifyLevel = EFileVerifyLevel.Middle;
         private int _verifyMaxNum;
         private int _verifyTotalCount;
         private float _verifyStartTime;
@@ -66,11 +32,11 @@ namespace YooAsset
         private ESteps _steps = ESteps.None;
 
 
-        internal VerifyCacheFilesOperation(DefaultCacheFileSystem fileSystem, List<CacheFileElement> elements)
+        internal VerifyCacheFilesOperation(ICacheSystem cacheSystem, EFileVerifyLevel verifyLevel, List<CacheFileElement> elements)
         {
-            _fileSystem = fileSystem;
+            _cacheSystem = cacheSystem;
+            _verifyLevel = verifyLevel;
             _waitingList = elements;
-            _verifyLevel = _fileSystem.FileVerifyLevel;
         }
         internal override void InternalOnStart()
         {
@@ -158,8 +124,8 @@ namespace YooAsset
             if (element.Result == EFileVerifyResult.Succeed)
             {
                 _succeedCount++;
-                var fileWrapper = new DefaultCacheFileSystem.FileWrapper(element.InfoFilePath, element.DataFilePath, element.DataFileCRC, element.DataFileSize);
-                _fileSystem.RecordFile(element.BundleGUID, fileWrapper);
+                var fileWrapper = new CacheWrapper(element.InfoFilePath, element.DataFilePath, element.DataFileCRC, element.DataFileSize);
+                _cacheSystem.RecordFile(element.BundleGUID, fileWrapper);
             }
             else
             {
@@ -191,7 +157,7 @@ namespace YooAsset
                         return EFileVerifyResult.InfoFileNotExisted;
 
                     // 解析信息文件获取验证数据
-                    _fileSystem.ReadInfoFile(element.InfoFilePath, out element.DataFileCRC, out element.DataFileSize);
+                    _cacheSystem.ReadInfoFile(element.InfoFilePath, out element.DataFileCRC, out element.DataFileSize);
                 }
             }
             catch (Exception)

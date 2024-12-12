@@ -15,7 +15,9 @@ namespace YooAsset
             Done,
         }
 
-        private readonly DefaultCacheFileSystem _fileSystem;
+        private readonly ICacheSystem _cacheSystem;
+        private readonly string _packageName;
+        private readonly bool _appendFileExtension;
         private IEnumerator<DirectoryInfo> _filesEnumerator = null;
         private float _verifyStartTime;
         private ESteps _steps = ESteps.None;
@@ -26,9 +28,11 @@ namespace YooAsset
         public readonly List<CacheFileElement> Result = new List<CacheFileElement>(5000);
 
 
-        internal SearchCacheFilesOperation(DefaultCacheFileSystem fileSystem)
+        internal SearchCacheFilesOperation(ICacheSystem cacheSystem, string packageName, bool appendFileExtension)
         {
-            _fileSystem = fileSystem;
+            _cacheSystem = cacheSystem;
+            _packageName = packageName;
+            _appendFileExtension = appendFileExtension;   
         }
         internal override void InternalOnStart()
         {
@@ -42,7 +46,7 @@ namespace YooAsset
 
             if (_steps == ESteps.Prepare)
             {
-                DirectoryInfo rootDirectory = new DirectoryInfo(_fileSystem.GetCacheFilesRoot());
+                DirectoryInfo rootDirectory = new DirectoryInfo(_cacheSystem.GetCacheFileRoot());
                 if (rootDirectory.Exists)
                 {
                     var directorieInfos = rootDirectory.EnumerateDirectories();
@@ -80,7 +84,7 @@ namespace YooAsset
                 foreach (var chidDirectory in childDirectories)
                 {
                     string bundleGUID = chidDirectory.Name;
-                    if (_fileSystem.IsRecordFile(bundleGUID))
+                    if (_cacheSystem.IsRecordFile(bundleGUID))
                         continue;
 
                     // 创建验证元素类
@@ -89,14 +93,14 @@ namespace YooAsset
                     string infoFilePath = $"{fileRootPath}/{ DefaultCacheFileSystemDefine.SaveBundleInfoFileName}";
 
                     // 存储的数据文件追加文件格式
-                    if (_fileSystem.AppendFileExtension)
+                    if (_appendFileExtension)
                     {
                         string dataFileExtension = FindDataFileExtension(chidDirectory);
                         if (string.IsNullOrEmpty(dataFileExtension) == false)
                             dataFilePath += dataFileExtension;
                     }
 
-                    var element = new CacheFileElement(_fileSystem.PackageName, bundleGUID, fileRootPath, dataFilePath, infoFilePath);
+                    var element = new CacheFileElement(_packageName, bundleGUID, fileRootPath, dataFilePath, infoFilePath);
                     Result.Add(element);
                 }
 

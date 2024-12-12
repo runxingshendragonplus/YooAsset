@@ -57,7 +57,7 @@ namespace YooAsset
             {
                 if (_searchCacheFilesOp == null)
                 {
-                    _searchCacheFilesOp = new SearchCacheFilesOperation(_fileSytem);
+                    _searchCacheFilesOp = new SearchCacheFilesOperation(_fileSytem, _fileSytem.PackageName, _fileSytem.AppendFileExtension);
                     OperationSystem.StartOperation(_fileSytem.PackageName, _searchCacheFilesOp);
                 }
 
@@ -72,7 +72,7 @@ namespace YooAsset
             {
                 if (_verifyCacheFilesOp == null)
                 {
-                    _verifyCacheFilesOp = new VerifyCacheFilesOperation(_fileSytem, _searchCacheFilesOp.Result);
+                    _verifyCacheFilesOp = new VerifyCacheFilesOperation(_fileSytem, _fileSytem.FileVerifyLevel, _searchCacheFilesOp.Result);
                     OperationSystem.StartOperation(_fileSytem.PackageName, _verifyCacheFilesOp);
                 }
 

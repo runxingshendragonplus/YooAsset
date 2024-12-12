@@ -3,29 +3,10 @@ using System.Threading;
 
 namespace YooAsset
 {
-    internal class TempFileElement
-    {
-        public string TempFilePath { private set; get; }
-        public string TempFileCRC { private set; get; }
-        public long TempFileSize { private set; get; }
-
-        /// <summary>
-        /// 注意：原子操作对象
-        /// </summary>
-        public int Result = 0;
-
-        public TempFileElement(string filePath, string fileCRC, long fileSize)
-        {
-            TempFilePath = filePath;
-            TempFileCRC = fileCRC;
-            TempFileSize = fileSize;
-        }
-    }
-
     /// <summary>
     /// 下载文件验证（线程版）
     /// </summary>
-    internal class VerifyTempFileOperation : AsyncOperationBase
+    internal sealed class VerifyTempFileOperation : AsyncOperationBase
     {
         private enum ESteps
         {
@@ -41,7 +22,7 @@ namespace YooAsset
         /// <summary>
         /// 验证结果
         /// </summary>
-        public EFileVerifyResult VerifyResult { protected set; get; }
+        public EFileVerifyResult VerifyResult { private set; get; }
 
 
         internal VerifyTempFileOperation(TempFileElement element)
