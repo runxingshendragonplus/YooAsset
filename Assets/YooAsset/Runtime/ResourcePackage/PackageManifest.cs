@@ -211,9 +211,23 @@ namespace YooAsset
         }
 
         /// <summary>
+        /// 获取所有的资源信息
+        /// </summary>
+        public AssetInfo[] GetAllAssetInfos()
+        {
+            List<AssetInfo> result = new List<AssetInfo>(AssetList.Count);
+            foreach (var packageAsset in AssetList)
+            {
+                AssetInfo assetInfo = new AssetInfo(PackageName, packageAsset, null);
+                result.Add(assetInfo);
+            }
+            return result.ToArray();
+        }
+
+        /// <summary>
         /// 获取资源信息列表
         /// </summary>
-        public AssetInfo[] GetAssetsInfoByTags(string[] tags)
+        public AssetInfo[] GetAssetInfosByTags(string[] tags)
         {
             List<AssetInfo> result = new List<AssetInfo>(100);
             foreach (var packageAsset in AssetList)

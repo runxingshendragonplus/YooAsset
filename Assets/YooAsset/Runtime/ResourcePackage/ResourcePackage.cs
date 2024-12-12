@@ -340,6 +340,15 @@ namespace YooAsset
         }
 
         /// <summary>
+        /// 获取所有的资源信息
+        /// </summary>
+        public AssetInfo[] GetAllAssetInfos()
+        {
+            DebugCheckInitialize();
+            return _playModeImpl.ActiveManifest.GetAllAssetInfos();
+        }
+
+        /// <summary>
         /// 获取资源信息列表
         /// </summary>
         /// <param name="tag">资源标签</param>
@@ -347,7 +356,7 @@ namespace YooAsset
         {
             DebugCheckInitialize();
             string[] tags = new string[] { tag };
-            return _playModeImpl.ActiveManifest.GetAssetsInfoByTags(tags);
+            return _playModeImpl.ActiveManifest.GetAssetInfosByTags(tags);
         }
 
         /// <summary>
@@ -357,7 +366,7 @@ namespace YooAsset
         public AssetInfo[] GetAssetInfos(string[] tags)
         {
             DebugCheckInitialize();
-            return _playModeImpl.ActiveManifest.GetAssetsInfoByTags(tags);
+            return _playModeImpl.ActiveManifest.GetAssetInfosByTags(tags);
         }
 
         /// <summary>
