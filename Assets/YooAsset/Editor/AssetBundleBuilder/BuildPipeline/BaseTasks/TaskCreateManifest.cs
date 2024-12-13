@@ -97,6 +97,7 @@ namespace YooAsset.Editor
         private void CheckBundleHashConflict(BuildMapContext buildMapContext)
         {
             // 说明：在特殊情况下，例如某些文件加密算法会导致加密后的文件哈希值冲突！
+            // 说明：二进制完全相同的原生文件也会冲突！
             HashSet<string> guids = new HashSet<string>();
             foreach (var bundleInfo in buildMapContext.Collection)
             {
