@@ -1,13 +1,10 @@
 ﻿
 namespace YooAsset
 {
-    /// <summary>
-    /// 清理未使用的文件
-    /// </summary>
-    public abstract class ClearUnusedBundleFilesOperation : AsyncOperationBase
+    public abstract class ClearCacheBundleFilesOperation : AsyncOperationBase
     {
     }
-    internal sealed class ClearUnusedBundleFilesImplOperation : ClearUnusedBundleFilesOperation
+    internal sealed class ClearCacheBundleFilesImplOperation : ClearCacheBundleFilesOperation
     {
         private enum ESteps
         {
@@ -22,17 +19,21 @@ namespace YooAsset
         private readonly IFileSystem _fileSystemA;
         private readonly IFileSystem _fileSystemB;
         private readonly IFileSystem _fileSystemC;
-        private FSClearUnusedBundleFilesOperation _clearUnusedBundleFilesOpA;
-        private FSClearUnusedBundleFilesOperation _clearUnusedBundleFilesOpB;
-        private FSClearUnusedBundleFilesOperation _clearUnusedBundleFilesOpC;
+        private readonly string _clearMode;
+        private readonly object _clearParam;
+        private FSClearCacheBundleFilesOperation _clearCacheBundleFilesOpA;
+        private FSClearCacheBundleFilesOperation _clearCacheBundleFilesOpB;
+        private FSClearCacheBundleFilesOperation _clearCacheBundleFilesOpC;
         private ESteps _steps = ESteps.None;
-
-        internal ClearUnusedBundleFilesImplOperation(IPlayMode impl, IFileSystem fileSystemA, IFileSystem fileSystemB, IFileSystem fileSystemC)
+        
+        internal ClearCacheBundleFilesImplOperation(IPlayMode impl, IFileSystem fileSystemA, IFileSystem fileSystemB, IFileSystem fileSystemC, string clearMode, object clearParam)
         {
             _impl = impl;
             _fileSystemA = fileSystemA;
             _fileSystemB = fileSystemB;
             _fileSystemC = fileSystemC;
+            _clearMode = clearMode;
+            _clearParam = clearParam;
         }
         internal override void InternalOnStart()
         {
@@ -51,14 +52,14 @@ namespace YooAsset
                     return;
                 }
 
-                if (_clearUnusedBundleFilesOpA == null)
-                    _clearUnusedBundleFilesOpA = _fileSystemA.ClearUnusedBundleFilesAsync(_impl.ActiveManifest);
+                if (_clearCacheBundleFilesOpA == null)
+                    _clearCacheBundleFilesOpA = _fileSystemA.ClearCacheBundleFilesAsync(_impl.ActiveManifest, _clearMode, _clearParam);
 
-                Progress = _clearUnusedBundleFilesOpA.Progress;
-                if (_clearUnusedBundleFilesOpA.IsDone == false)
+                Progress = _clearCacheBundleFilesOpA.Progress;
+                if (_clearCacheBundleFilesOpA.IsDone == false)
                     return;
 
-                if (_clearUnusedBundleFilesOpA.Status == EOperationStatus.Succeed)
+                if (_clearCacheBundleFilesOpA.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.ClearFileSystemB;
                 }
@@ -66,7 +67,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _clearUnusedBundleFilesOpA.Error;
+                    Error = _clearCacheBundleFilesOpA.Error;
                 }
             }
 
@@ -78,23 +79,22 @@ namespace YooAsset
                     return;
                 }
 
-                if (_clearUnusedBundleFilesOpB == null)
-                    _clearUnusedBundleFilesOpB = _fileSystemB.ClearUnusedBundleFilesAsync(_impl.ActiveManifest);
+                if (_clearCacheBundleFilesOpB == null)
+                    _clearCacheBundleFilesOpB = _fileSystemB.ClearCacheBundleFilesAsync(_impl.ActiveManifest, _clearMode, _clearParam);
 
-                Progress = _clearUnusedBundleFilesOpB.Progress;
-                if (_clearUnusedBundleFilesOpB.IsDone == false)
+                Progress = _clearCacheBundleFilesOpB.Progress;
+                if (_clearCacheBundleFilesOpB.IsDone == false)
                     return;
 
-                if (_clearUnusedBundleFilesOpB.Status == EOperationStatus.Succeed)
+                if (_clearCacheBundleFilesOpB.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.ClearFileSystemC;
-
                 }
                 else
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _clearUnusedBundleFilesOpB.Error;
+                    Error = _clearCacheBundleFilesOpB.Error;
                 }
             }
 
@@ -107,14 +107,14 @@ namespace YooAsset
                     return;
                 }
 
-                if (_clearUnusedBundleFilesOpC == null)
-                    _clearUnusedBundleFilesOpC = _fileSystemC.ClearUnusedBundleFilesAsync(_impl.ActiveManifest);
+                if (_clearCacheBundleFilesOpC == null)
+                    _clearCacheBundleFilesOpC = _fileSystemC.ClearCacheBundleFilesAsync(_impl.ActiveManifest, _clearMode, _clearParam);
 
-                Progress = _clearUnusedBundleFilesOpC.Progress;
-                if (_clearUnusedBundleFilesOpC.IsDone == false)
+                Progress = _clearCacheBundleFilesOpC.Progress;
+                if (_clearCacheBundleFilesOpC.IsDone == false)
                     return;
 
-                if (_clearUnusedBundleFilesOpC.Status == EOperationStatus.Succeed)
+                if (_clearCacheBundleFilesOpC.Status == EOperationStatus.Succeed)
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Succeed;
@@ -123,7 +123,7 @@ namespace YooAsset
                 {
                     _steps = ESteps.Done;
                     Status = EOperationStatus.Failed;
-                    Error = _clearUnusedBundleFilesOpC.Error;
+                    Error = _clearCacheBundleFilesOpC.Error;
                 }
             }
         }

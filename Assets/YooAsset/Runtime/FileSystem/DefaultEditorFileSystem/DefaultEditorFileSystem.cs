@@ -69,15 +69,9 @@ namespace YooAsset
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-        public virtual FSClearAllBundleFilesOperation ClearAllBundleFilesAsync()
+        public virtual FSClearCacheBundleFilesOperation ClearCacheBundleFilesAsync(PackageManifest manifest, string clearMode, object clearParam)
         {
-            var operation = new FSClearAllBundleFilesCompleteOperation();
-            OperationSystem.StartOperation(PackageName, operation);
-            return operation;
-        }
-        public virtual FSClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync(PackageManifest manifest)
-        {
-            var operation = new FSClearUnusedBundleFilesCompleteOperation();
+            var operation = new FSClearCacheBundleFilesCompleteOperation(null);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }

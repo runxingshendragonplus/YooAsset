@@ -111,17 +111,33 @@ namespace YooAsset
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-        public virtual FSClearAllBundleFilesOperation ClearAllBundleFilesAsync()
+        public virtual FSClearCacheBundleFilesOperation ClearCacheBundleFilesAsync(PackageManifest manifest, string clearMode, object clearParam)
         {
-            var operation = new ClearAllCacheFilesOperation(this);
-            OperationSystem.StartOperation(PackageName, operation);
-            return operation;
-        }
-        public virtual FSClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync(PackageManifest manifest)
-        {
-            var operation = new ClearUnusedCacheFilesOperation(this, manifest);
-            OperationSystem.StartOperation(PackageName, operation);
-            return operation;
+            if(clearMode == EFileClearMode.ClearAllBundleFiles.ToString())
+            {
+                var operation = new ClearAllCacheFilesOperation(this);
+                OperationSystem.StartOperation(PackageName, operation);
+                return operation;
+            }
+            else if(clearMode == EFileClearMode.ClearUnusedBundleFiles.ToString())
+            {
+                var operation = new ClearUnusedCacheFilesOperation(this, manifest);
+                OperationSystem.StartOperation(PackageName, operation);
+                return operation;
+            }
+            else if(clearMode == EFileClearMode.ClearBundleFilesByTags.ToString())
+            {
+                var operation = new ClearCacheFilesByTagsOperaiton(this, manifest, clearParam);
+                OperationSystem.StartOperation(PackageName, operation);
+                return operation;
+            }
+            else
+            {
+                string error = $"Invalid clear mode : {clearMode}";
+                var operation = new FSClearCacheBundleFilesCompleteOperation(error);
+                OperationSystem.StartOperation(PackageName, operation);
+                return operation;
+            }
         }
         public virtual FSDownloadFileOperation DownloadFileAsync(PackageBundle bundle, DownloadParam param)
         {

@@ -74,16 +74,9 @@ namespace YooAsset
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }
-
-        ClearAllBundleFilesOperation IPlayMode.ClearAllBundleFilesAsync()
+        ClearCacheBundleFilesOperation IPlayMode.ClearCacheBundleFilesAsync(string clearMode, object clearParam)
         {
-            var operation = new ClearAllBundleFilesImplOperation(this, WebServerFileSystem, WebRemoteFileSystem, null);
-            OperationSystem.StartOperation(PackageName, operation);
-            return operation;
-        }
-        ClearUnusedBundleFilesOperation IPlayMode.ClearUnusedBundleFilesAsync()
-        {
-            var operation = new ClearUnusedBundleFilesImplOperation(this, WebServerFileSystem, WebRemoteFileSystem, null);
+            var operation = new ClearCacheBundleFilesImplOperation(this, WebServerFileSystem, WebRemoteFileSystem, null, clearMode, clearParam);
             OperationSystem.StartOperation(PackageName, operation);
             return operation;
         }

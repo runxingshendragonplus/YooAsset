@@ -236,21 +236,25 @@ namespace YooAsset
         }
 
         /// <summary>
-        /// 清理文件系统所有的资源文件
+        /// 清理缓存文件
         /// </summary>
-        public ClearAllBundleFilesOperation ClearAllBundleFilesAsync()
+        /// <param name="clearMode">清理方式</param>
+        /// <param name="clearParam">执行参数</param>
+        public ClearCacheBundleFilesOperation ClearCacheBundleFilesAsync(EFileClearMode clearMode, object clearParam = null)
         {
             DebugCheckInitialize();
-            return _playModeImpl.ClearAllBundleFilesAsync();
+            return _playModeImpl.ClearCacheBundleFilesAsync(clearMode.ToString(), clearParam);
         }
 
         /// <summary>
-        /// 清理文件系统未使用的资源文件
+        /// 清理缓存文件
         /// </summary>
-        public ClearUnusedBundleFilesOperation ClearUnusedBundleFilesAsync()
+        /// <param name="clearMode">清理方式</param>
+        /// <param name="clearParam">执行参数</param>
+        public ClearCacheBundleFilesOperation ClearCacheBundleFilesAsync(string clearMode, object clearParam = null)
         {
             DebugCheckInitialize();
-            return _playModeImpl.ClearUnusedBundleFilesAsync();
+            return _playModeImpl.ClearCacheBundleFilesAsync(clearMode, clearParam);
         }
 
         /// <summary>

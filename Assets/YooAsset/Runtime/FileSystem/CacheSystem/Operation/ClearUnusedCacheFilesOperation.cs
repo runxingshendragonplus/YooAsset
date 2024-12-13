@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace YooAsset
 {
-    internal sealed class ClearUnusedCacheFilesOperation : FSClearUnusedBundleFilesOperation
+    internal sealed class ClearUnusedCacheFilesOperation : FSClearCacheBundleFilesOperation
     {
         private enum ESteps
         {
