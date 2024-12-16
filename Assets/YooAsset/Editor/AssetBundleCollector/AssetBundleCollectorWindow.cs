@@ -657,7 +657,7 @@ namespace YooAsset.Editor
 
             // 激活状态
             IActiveRule activeRule = AssetBundleCollectorSettingData.GetActiveRuleInstance(group.ActiveRuleName);
-            bool isActive = activeRule.IsActiveGroup();
+            bool isActive = activeRule.IsActiveGroup(new GroupData(group.GroupName));
             textField1.SetEnabled(isActive);
         }
         private void GroupListView_onSelectionChange(IEnumerable<object> objs)
