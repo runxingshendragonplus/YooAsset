@@ -18,7 +18,7 @@ namespace YooAsset.Editor
         /// <summary>
         /// 创建补丁清单文件到输出目录
         /// </summary>
-        protected void CreateManifestFile(BuildContext context)
+        protected void CreateManifestFile(bool processBundleDepends, bool processBundleTags, BuildContext context)
         {
             var buildMapContext = context.GetContextObject<BuildMapContext>();
             var buildParametersContext = context.GetContextObject<BuildParametersContext>();
@@ -42,14 +42,13 @@ namespace YooAsset.Editor
             manifest.BundleList = GetAllPackageBundle(buildMapContext);
             manifest.AssetList = GetAllPackageAsset(buildMapContext);
 
-            if (buildParameters.BuildMode != EBuildMode.SimulateBuild)
-            {
-                // 处理资源包的依赖列表
+            // 处理资源包的依赖列表
+            if (processBundleDepends)
                 ProcessBundleDepends(context, manifest);
 
-                // 处理资源包的标签集合
+            // 处理资源包的标签集合
+            if (processBundleTags)
                 ProcessBundleTags(manifest);
-            }
 
             // 创建补丁清单文本文件
             {

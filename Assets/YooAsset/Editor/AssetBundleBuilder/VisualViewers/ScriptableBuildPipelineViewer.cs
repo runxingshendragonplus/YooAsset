@@ -54,7 +54,6 @@ namespace YooAsset.Editor
         {
             List<Enum> buildModeList = new List<Enum>();
             buildModeList.Add(EBuildMode.IncrementalBuild);
-            buildModeList.Add(EBuildMode.SimulateBuild);
             return buildModeList;
         }
     }

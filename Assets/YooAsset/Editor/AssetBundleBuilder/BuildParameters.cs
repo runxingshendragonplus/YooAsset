@@ -99,16 +99,6 @@ namespace YooAsset.Editor
                 throw new Exception(message);
             }
 
-            // 检测是否有未保存场景
-            if (BuildMode != EBuildMode.SimulateBuild)
-            {
-                if (EditorTools.HasDirtyScenes())
-                {
-                    string message = BuildLogger.GetErrorMessage(ErrorCode.FoundUnsavedScene, "Found unsaved scene !");
-                    throw new Exception(message);
-                }
-            }
-
             // 检测构建参数合法性
             if (BuildTarget == BuildTarget.NoTarget)
             {
@@ -134,34 +124,6 @@ namespace YooAsset.Editor
             {
                 string message = BuildLogger.GetErrorMessage(ErrorCode.BuildinFileRootIsNullOrEmpty, "Buildin file root is null or empty !");
                 throw new Exception(message);
-            }
-
-            // 强制构建删除包裹目录
-            if (BuildMode == EBuildMode.ForceRebuild)
-            {
-                string packageRootDirectory = GetPackageRootDirectory();
-                if (EditorTools.DeleteDirectory(packageRootDirectory))
-                {
-                    BuildLogger.Log($"Delete package root directory: {packageRootDirectory}");
-                }
-            }
-
-            // 检测包裹输出目录是否存在
-            if (BuildMode != EBuildMode.SimulateBuild)
-            {
-                string packageOutputDirectory = GetPackageOutputDirectory();
-                if (Directory.Exists(packageOutputDirectory))
-                {
-                    string message = BuildLogger.GetErrorMessage(ErrorCode.PackageOutputDirectoryExists, $"Package outout directory exists: {packageOutputDirectory}");
-                    throw new Exception(message);
-                }
-            }
-
-            // 如果输出目录不存在
-            string pipelineOutputDirectory = GetPipelineOutputDirectory();
-            if (EditorTools.CreateDirectory(pipelineOutputDirectory))
-            {
-                BuildLogger.Log($"Create pipeline output directory: {pipelineOutputDirectory}");
             }
 
             // 设置默认备注信息

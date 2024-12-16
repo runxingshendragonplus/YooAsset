@@ -15,10 +15,5 @@ namespace YooAsset.Editor
         /// 增量构建模式
         /// </summary>
         IncrementalBuild,
-
-        /// <summary>
-        /// 模拟构建模式
-        /// </summary>
-        SimulateBuild,
     }
 }

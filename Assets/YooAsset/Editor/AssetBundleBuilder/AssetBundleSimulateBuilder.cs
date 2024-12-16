@@ -10,66 +10,20 @@ namespace YooAsset.Editor
         /// </summary>
         public static SimulateBuildResult SimulateBuild(string buildPipelineName, string packageName)
         {
-            string packageVersion = "Simulate";
-            BuildResult buildResult;
+            var buildParameters = new EditorSimulateBuildParameters();
+            buildParameters.BuildOutputRoot = AssetBundleBuilderHelper.GetDefaultBuildOutputRoot();
+            buildParameters.BuildinFileRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot();
+            buildParameters.BuildPipeline = EBuildPipeline.EditorSimulateBuildPipeline.ToString();
+            buildParameters.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
+            buildParameters.BuildMode = EBuildMode.ForceRebuild;
+            buildParameters.PackageName = packageName;
+            buildParameters.PackageVersion = "Simulate";
+            buildParameters.FileNameStyle = EFileNameStyle.HashName;
+            buildParameters.BuildinFileCopyOption = EBuildinFileCopyOption.None;
+            buildParameters.BuildinFileCopyParams = string.Empty;
 
-            if (buildPipelineName == EBuildPipeline.BuiltinBuildPipeline.ToString())
-            {
-                BuiltinBuildParameters buildParameters = new BuiltinBuildParameters();
-                buildParameters.BuildOutputRoot = AssetBundleBuilderHelper.GetDefaultBuildOutputRoot();
-                buildParameters.BuildinFileRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot();
-                buildParameters.BuildPipeline = buildPipelineName;
-                buildParameters.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
-                buildParameters.BuildMode = EBuildMode.SimulateBuild;
-                buildParameters.PackageName = packageName;
-                buildParameters.PackageVersion = packageVersion;
-                buildParameters.FileNameStyle = EFileNameStyle.HashName;
-                buildParameters.BuildinFileCopyOption = EBuildinFileCopyOption.None;
-                buildParameters.BuildinFileCopyParams = string.Empty;
-
-                BuiltinBuildPipeline pipeline = new BuiltinBuildPipeline();
-                buildResult = pipeline.Run(buildParameters, false);
-            }
-            else if (buildPipelineName == EBuildPipeline.ScriptableBuildPipeline.ToString())
-            {
-                ScriptableBuildParameters buildParameters = new ScriptableBuildParameters();
-                buildParameters.BuildOutputRoot = AssetBundleBuilderHelper.GetDefaultBuildOutputRoot();
-                buildParameters.BuildinFileRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot();
-                buildParameters.BuildPipeline = buildPipelineName;
-                buildParameters.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
-                buildParameters.BuildMode = EBuildMode.SimulateBuild;
-                buildParameters.PackageName = packageName;
-                buildParameters.PackageVersion = packageVersion;
-                buildParameters.FileNameStyle = EFileNameStyle.HashName;
-                buildParameters.BuildinFileCopyOption = EBuildinFileCopyOption.None;
-                buildParameters.BuildinFileCopyParams = string.Empty;
-
-                ScriptableBuildPipeline pipeline = new ScriptableBuildPipeline();
-                buildResult = pipeline.Run(buildParameters, true);
-            }
-            else if (buildPipelineName == EBuildPipeline.RawFileBuildPipeline.ToString())
-            {
-                RawFileBuildParameters buildParameters = new RawFileBuildParameters();
-                buildParameters.BuildOutputRoot = AssetBundleBuilderHelper.GetDefaultBuildOutputRoot();
-                buildParameters.BuildinFileRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot();
-                buildParameters.BuildPipeline = buildPipelineName;
-                buildParameters.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
-                buildParameters.BuildMode = EBuildMode.SimulateBuild;
-                buildParameters.PackageName = packageName;
-                buildParameters.PackageVersion = packageVersion;
-                buildParameters.FileNameStyle = EFileNameStyle.HashName;
-                buildParameters.BuildinFileCopyOption = EBuildinFileCopyOption.None;
-                buildParameters.BuildinFileCopyParams = string.Empty;
-
-                RawFileBuildPipeline pipeline = new RawFileBuildPipeline();
-                buildResult = pipeline.Run(buildParameters, true);
-            }
-            else
-            {
-                throw new System.NotImplementedException(buildPipelineName);
-            }
-
-            // 返回结果
+            var pipeline = new EditorSimulateBuildPipeline();
+            BuildResult buildResult = pipeline.Run(buildParameters, false);
             if (buildResult.Success)
             {
                 SimulateBuildResult reulst = new SimulateBuildResult();

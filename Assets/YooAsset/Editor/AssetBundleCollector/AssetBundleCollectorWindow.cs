@@ -42,7 +42,7 @@ namespace YooAsset.Editor
         private Toggle _includeAssetGUIDToogle;
         private Toggle _autoCollectShadersToogle;
         private PopupField<RuleDisplayName> _ignoreRulePopupField;
-        
+
         private VisualElement _packageContainer;
         private ListView _packageListView;
         private TextField _packageNameTxt;
@@ -172,10 +172,10 @@ namespace YooAsset.Editor
                     _ignoreRulePopupField.style.width = 300;
                     _ignoreRulePopupField.formatListItemCallback = FormatListItemCallback;
                     _ignoreRulePopupField.formatSelectedValueCallback = FormatSelectedValueCallback;
-                    _ignoreRulePopupField.RegisterValueChangedCallback(evt => 
+                    _ignoreRulePopupField.RegisterValueChangedCallback(evt =>
                     {
                         var selectPackage = _packageListView.selectedItem as AssetBundleCollectorPackage;
-                        if(selectPackage != null)
+                        if (selectPackage != null)
                         {
                             selectPackage.IgnoreRuleName = evt.newValue.ClassName;
                             AssetBundleCollectorSettingData.ModifyPackage(selectPackage);
@@ -991,7 +991,7 @@ namespace YooAsset.Editor
                 try
                 {
                     IIgnoreRule ignoreRule = AssetBundleCollectorSettingData.GetIgnoreRuleInstance(_ignoreRulePopupField.value.ClassName);
-                    CollectCommand command = new CollectCommand(EBuildMode.SimulateBuild,
+                    CollectCommand command = new CollectCommand(true,
                         _packageNameTxt.value,
                         _enableAddressableToogle.value,
                         _locationToLowerToogle.value,

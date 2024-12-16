@@ -53,7 +53,6 @@ namespace YooAsset.Editor
         {
             List<Enum> buildModeList = new List<Enum>();
             buildModeList.Add(EBuildMode.ForceRebuild);
-            buildModeList.Add(EBuildMode.SimulateBuild);
             return buildModeList;
         }
     }

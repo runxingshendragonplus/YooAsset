@@ -10,11 +10,25 @@ using UnityEngine.UIElements;
 
 namespace YooAsset.Editor
 {
-    internal class BuiltinBuildPipelineViewer : BuildPipelineViewerBase
+    internal class EditorSimulateBuildPipelineViewer : BuildPipelineViewerBase
     {
-        public BuiltinBuildPipelineViewer(string packageName, BuildTarget buildTarget, VisualElement parent)
-            : base(packageName, EBuildPipeline.BuiltinBuildPipeline, buildTarget, parent)
+        public EditorSimulateBuildPipelineViewer(string packageName, BuildTarget buildTarget, VisualElement parent)
+            : base(packageName, EBuildPipeline.RawFileBuildPipeline, buildTarget, parent)
         {
+            var compressionField = Root.Q<EnumField>("Compression");
+            UIElementsTools.SetElementVisible(compressionField, false);
+
+            var encryptionContainer = Root.Q<VisualElement>("EncryptionContainer");
+            UIElementsTools.SetElementVisible(encryptionContainer, false);
+
+            var fileNameStyleField = Root.Q<EnumField>("FileNameStyle");
+            UIElementsTools.SetElementVisible(fileNameStyleField, false);
+
+            var copyBuildinFileOptionField = Root.Q<EnumField>("CopyBuildinFileOption");
+            UIElementsTools.SetElementVisible(copyBuildinFileOptionField, false);
+
+            var CopyBuildinFileParamField = Root.Q<TextField>("CopyBuildinFileParam");
+            UIElementsTools.SetElementVisible(CopyBuildinFileParamField, false);
         }
 
         /// <summary>
@@ -26,9 +40,8 @@ namespace YooAsset.Editor
             var fileNameStyle = AssetBundleBuilderSetting.GetPackageFileNameStyle(PackageName, BuildPipeline);
             var buildinFileCopyOption = AssetBundleBuilderSetting.GetPackageBuildinFileCopyOption(PackageName, BuildPipeline);
             var buildinFileCopyParams = AssetBundleBuilderSetting.GetPackageBuildinFileCopyParams(PackageName, BuildPipeline);
-            var compressOption = AssetBundleBuilderSetting.GetPackageCompressOption(PackageName, BuildPipeline);
 
-            BuiltinBuildParameters buildParameters = new BuiltinBuildParameters();
+            EditorSimulateBuildParameters buildParameters = new EditorSimulateBuildParameters();
             buildParameters.BuildOutputRoot = AssetBundleBuilderHelper.GetDefaultBuildOutputRoot();
             buildParameters.BuildinFileRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot();
             buildParameters.BuildPipeline = BuildPipeline.ToString();
@@ -36,15 +49,13 @@ namespace YooAsset.Editor
             buildParameters.BuildMode = buildMode;
             buildParameters.PackageName = PackageName;
             buildParameters.PackageVersion = GetPackageVersion();
-            buildParameters.EnableSharePackRule = true;
             buildParameters.VerifyBuildingResult = true;
             buildParameters.FileNameStyle = fileNameStyle;
             buildParameters.BuildinFileCopyOption = buildinFileCopyOption;
             buildParameters.BuildinFileCopyParams = buildinFileCopyParams;
             buildParameters.EncryptionServices = CreateEncryptionInstance();
-            buildParameters.CompressOption = compressOption;
 
-            BuiltinBuildPipeline pipeline = new BuiltinBuildPipeline();
+            EditorSimulateBuildPipeline pipeline = new EditorSimulateBuildPipeline();
             var buildResult = pipeline.Run(buildParameters, true);
             if (buildResult.Success)
                 EditorUtility.RevealInFinder(buildResult.OutputPackageDirectory);
@@ -54,7 +65,6 @@ namespace YooAsset.Editor
         {
             List<Enum> buildModeList = new List<Enum>();
             buildModeList.Add(EBuildMode.ForceRebuild);
-            buildModeList.Add(EBuildMode.IncrementalBuild);
             return buildModeList;
         }
     }

@@ -1,15 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
+﻿
+using System;
 
 namespace YooAsset.Editor
 {
-    public class TaskCreateManifest_RFBP : TaskCreateManifest, IBuildTask
+    public class TaskCreateManifest_ESBP : TaskCreateManifest, IBuildTask
     {
         void IBuildTask.Run(BuildContext context)
         {
-            CreateManifestFile(false, true, context);
+            CreateManifestFile(false, false, context);
         }
 
         protected override string[] GetBundleDepends(BuildContext context, string bundleName)

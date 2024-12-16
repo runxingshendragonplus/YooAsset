@@ -140,7 +140,7 @@ namespace YooAsset.Editor
         public List<CollectAssetInfo> GetAllCollectAssets(CollectCommand command, AssetBundleCollectorGroup group)
         {
             // 注意：模拟构建模式下只收集主资源
-            if (command.BuildMode == EBuildMode.SimulateBuild)
+            if (command.SimulateBuild)
             {
                 if (CollectorType != ECollectorType.MainAssetCollector)
                     return new List<CollectAssetInfo>();
@@ -220,7 +220,7 @@ namespace YooAsset.Editor
             CollectAssetInfo collectAssetInfo = new CollectAssetInfo(CollectorType, bundleName, address, assetInfo, assetTags);
 
             // 注意：模拟构建模式下不需要收集依赖资源
-            if (command.BuildMode == EBuildMode.SimulateBuild)
+            if (command.SimulateBuild)
                 collectAssetInfo.DependAssets = new List<AssetInfo>();
             else
                 collectAssetInfo.DependAssets = GetAllDependencies(command, assetInfo.AssetPath);
