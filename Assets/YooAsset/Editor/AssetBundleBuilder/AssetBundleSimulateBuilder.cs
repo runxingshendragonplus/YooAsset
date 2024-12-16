@@ -8,8 +8,9 @@ namespace YooAsset.Editor
         /// <summary>
         /// 模拟构建
         /// </summary>
-        public static SimulateBuildResult SimulateBuild(string buildPipelineName, string packageName)
+        public static EditorSimulateBuildResult SimulateBuild(EditorSimulateBuildParam buildParam)
         {
+            string packageName = buildParam.PackageName;
             var buildParameters = new EditorSimulateBuildParameters();
             buildParameters.BuildOutputRoot = AssetBundleBuilderHelper.GetDefaultBuildOutputRoot();
             buildParameters.BuildinFileRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot();
@@ -25,7 +26,7 @@ namespace YooAsset.Editor
             BuildResult buildResult = pipeline.Run(buildParameters, false);
             if (buildResult.Success)
             {
-                SimulateBuildResult reulst = new SimulateBuildResult();
+                var reulst = new EditorSimulateBuildResult();
                 reulst.PackageRootDirectory = buildResult.OutputPackageDirectory;
                 return reulst;
             }
