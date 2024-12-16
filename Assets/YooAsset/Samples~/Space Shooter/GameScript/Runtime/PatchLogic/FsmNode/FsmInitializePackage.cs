@@ -33,7 +33,6 @@ internal class FsmInitializePackage : IStateNode
     {
         var playMode = (EPlayMode)_machine.GetBlackboardValue("PlayMode");
         var packageName = (string)_machine.GetBlackboardValue("PackageName");
-        var buildPipeline = (string)_machine.GetBlackboardValue("BuildPipeline");
         var rawFileSystem = (bool)_machine.GetBlackboardValue("RawFileSystem");
 
         // 创建资源包裹类
@@ -45,7 +44,9 @@ internal class FsmInitializePackage : IStateNode
         InitializationOperation initializationOperation = null;
         if (playMode == EPlayMode.EditorSimulateMode)
         {
-            var simulateBuildResult = EditorSimulateModeHelper.SimulateBuild(buildPipeline, packageName);
+            var simulateBuildParam = new EditorSimulateBuildParam();
+            simulateBuildParam.PackageName = packageName;
+            var simulateBuildResult = EditorSimulateModeHelper.SimulateBuild(simulateBuildParam);
             var createParameters = new EditorSimulateModeParameters();
             createParameters.EditorFileSystemParameters = FileSystemParameters.CreateDefaultEditorFileSystemParameters(simulateBuildResult);
             initializationOperation = package.InitializeAsync(createParameters);
