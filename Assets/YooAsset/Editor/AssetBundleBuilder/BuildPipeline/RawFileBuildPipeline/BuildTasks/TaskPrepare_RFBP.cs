@@ -16,15 +16,8 @@ namespace YooAsset.Editor
             // 检测基础构建参数
             buildParametersContext.CheckBuildParameters();
 
-            // 检测不被支持的构建模式
-            if (buildParameters.BuildMode == EBuildMode.IncrementalBuild)
-            {
-                string message = BuildLogger.GetErrorMessage(ErrorCode.BuildPipelineNotSupportBuildMode, $"{nameof(EBuildPipeline.RawFileBuildPipeline)} not support {nameof(EBuildMode.IncrementalBuild)} build mode !");
-                throw new Exception(message);
-            }
-
-            // 强制构建删除包裹目录
-            if (buildParameters.BuildMode == EBuildMode.ForceRebuild)
+            // 删除包裹目录
+            if (buildParameters.ClearBuildCacheFiles)
             {
                 string packageRootDirectory = buildParameters.GetPackageRootDirectory();
                 if (EditorTools.DeleteDirectory(packageRootDirectory))

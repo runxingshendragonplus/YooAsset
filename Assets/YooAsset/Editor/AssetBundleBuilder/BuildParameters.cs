@@ -32,11 +32,6 @@ namespace YooAsset.Editor
         public BuildTarget BuildTarget;
 
         /// <summary>
-        /// 构建模式
-        /// </summary>
-        public EBuildMode BuildMode;
-
-        /// <summary>
         /// 构建的包裹名称
         /// </summary>
         public string PackageName;
@@ -52,7 +47,12 @@ namespace YooAsset.Editor
         public string PackageNote;
 
         /// <summary>
-        /// 是否启用共享资源打包
+        /// 清空构建缓存文件
+        /// </summary>
+        public bool ClearBuildCacheFiles = false;
+        
+        /// <summary>
+        /// 启用共享资源打包
         /// </summary>
         public bool EnableSharePackRule = false;
 

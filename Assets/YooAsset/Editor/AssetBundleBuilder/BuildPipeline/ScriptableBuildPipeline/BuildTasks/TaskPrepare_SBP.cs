@@ -23,11 +23,17 @@ namespace YooAsset.Editor
                 throw new Exception(message);
             }
 
-            // 检测不被支持的构建模式
-            if (buildParameters.BuildMode == EBuildMode.ForceRebuild)
+            // 删除包裹目录
+            if (buildParameters.ClearBuildCacheFiles)
             {
-                string message = BuildLogger.GetErrorMessage(ErrorCode.BuildPipelineNotSupportBuildMode, $"{nameof(EBuildPipeline.ScriptableBuildPipeline)} not support {nameof(EBuildMode.ForceRebuild)} build mode !");
-                throw new Exception(message);
+                // Deletes the build cache directory.
+                UnityEditor.Build.Pipeline.Utilities.BuildCache.PurgeCache(false);
+
+                string packageRootDirectory = buildParameters.GetPackageRootDirectory();
+                if (EditorTools.DeleteDirectory(packageRootDirectory))
+                {
+                    BuildLogger.Log($"Delete package root directory: {packageRootDirectory}");
+                }
             }
 
             // 检测包裹输出目录是否存在

@@ -15,7 +15,6 @@ namespace YooAsset.Editor
         public BuildMapContext CreateBuildMap(bool simulateBuild, BuildParameters buildParameters)
         {
             BuildMapContext context = new BuildMapContext();
-            var buildMode = buildParameters.BuildMode;
             var packageName = buildParameters.PackageName;
 
             Dictionary<string, BuildAssetInfo> allBuildAssetInfos = new Dictionary<string, BuildAssetInfo>(1000);

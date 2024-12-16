@@ -24,8 +24,8 @@ namespace YooAsset.Editor
                 throw new Exception(message);
             }
 
-            // 强制构建删除包裹目录
-            if (buildParameters.BuildMode == EBuildMode.ForceRebuild)
+            // 删除包裹目录
+            if (buildParameters.ClearBuildCacheFiles)
             {
                 string packageRootDirectory = buildParameters.GetPackageRootDirectory();
                 if (EditorTools.DeleteDirectory(packageRootDirectory))

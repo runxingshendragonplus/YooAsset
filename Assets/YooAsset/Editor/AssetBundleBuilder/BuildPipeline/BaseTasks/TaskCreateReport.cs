@@ -28,7 +28,6 @@ namespace YooAsset.Editor
                 buildReport.Summary.BuildSeconds = BuildRunner.TotalSeconds;
                 buildReport.Summary.BuildTarget = buildParameters.BuildTarget;
                 buildReport.Summary.BuildPipeline = buildParameters.BuildPipeline;
-                buildReport.Summary.BuildMode = buildParameters.BuildMode;
                 buildReport.Summary.BuildPackageName = buildParameters.PackageName;
                 buildReport.Summary.BuildPackageVersion = buildParameters.PackageVersion;
                 buildReport.Summary.BuildPackageNote = buildParameters.PackageNote;
@@ -42,6 +41,7 @@ namespace YooAsset.Editor
                 buildReport.Summary.AutoCollectShaders = buildMapContext.Command.AutoCollectShaders;
 
                 // 构建参数
+                buildReport.Summary.ClearBuildCacheFiles = buildParameters.ClearBuildCacheFiles;
                 buildReport.Summary.EnableSharePackRule = buildParameters.EnableSharePackRule;
                 buildReport.Summary.EncryptionClassName = buildParameters.EncryptionServices == null ? "null" : buildParameters.EncryptionServices.GetType().FullName;
                 if (buildParameters.BuildPipeline == nameof(BuiltinBuildPipeline))

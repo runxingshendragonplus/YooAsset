@@ -15,7 +15,6 @@ namespace YooAsset.Editor
             buildParameters.BuildinFileRoot = AssetBundleBuilderHelper.GetStreamingAssetsRoot();
             buildParameters.BuildPipeline = EBuildPipeline.EditorSimulateBuildPipeline.ToString();
             buildParameters.BuildTarget = EditorUserBuildSettings.activeBuildTarget;
-            buildParameters.BuildMode = EBuildMode.ForceRebuild;
             buildParameters.PackageName = packageName;
             buildParameters.PackageVersion = "Simulate";
             buildParameters.FileNameStyle = EFileNameStyle.HashName;

@@ -13,7 +13,6 @@ namespace YooAsset.Editor
         BuildinFileRootIsNullOrEmpty = 114,
         PackageOutputDirectoryExists = 115,
         RecommendScriptBuildPipeline = 130,
-        BuildPipelineNotSupportBuildMode = 140,
 
         // TaskGetBuildMap
         RemoveInvalidTags = 200,
