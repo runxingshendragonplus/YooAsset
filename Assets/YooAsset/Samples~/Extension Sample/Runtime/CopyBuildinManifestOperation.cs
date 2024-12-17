@@ -125,7 +125,7 @@ public class CopyBuildinManifestOperation : GameAsyncOperation
 
     private string GetBuildinYooRoot()
     {
-        return PathUtility.Combine(Application.streamingAssetsPath, YooAssetSettingsData.Setting.DefaultYooFolderName);
+        return YooAssetSettingsData.GetYooMobileBuildinRoot();
     }
     private string GetBuildinHashFilePath()
     {
@@ -142,7 +142,7 @@ public class CopyBuildinManifestOperation : GameAsyncOperation
 
     private string GetCacheYooRoot()
     {
-        return PathUtility.Combine(UnityEngine.Application.persistentDataPath, YooAssetSettingsData.Setting.DefaultYooFolderName);
+        return YooAssetSettingsData.GetYooMobileCacheRoot();
     }
     private string GetCacheHashFilePath()
     {
