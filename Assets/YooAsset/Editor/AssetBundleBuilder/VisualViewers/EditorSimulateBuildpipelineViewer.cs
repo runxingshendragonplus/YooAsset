@@ -27,8 +27,11 @@ namespace YooAsset.Editor
             var copyBuildinFileOptionField = Root.Q<EnumField>("CopyBuildinFileOption");
             UIElementsTools.SetElementVisible(copyBuildinFileOptionField, false);
 
-            var CopyBuildinFileParamField = Root.Q<TextField>("CopyBuildinFileParam");
-            UIElementsTools.SetElementVisible(CopyBuildinFileParamField, false);
+            var copyBuildinFileParamField = Root.Q<TextField>("CopyBuildinFileParam");
+            UIElementsTools.SetElementVisible(copyBuildinFileParamField, false);
+
+            var clearBuildCacheToggle = Root.Q<Toggle>("ClearBuildCache");
+            UIElementsTools.SetElementVisible(clearBuildCacheToggle, false);
         }
 
         /// <summary>
