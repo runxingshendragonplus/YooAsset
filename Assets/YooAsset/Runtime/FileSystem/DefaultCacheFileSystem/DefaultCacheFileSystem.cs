@@ -255,7 +255,7 @@ namespace YooAsset
             PackageName = packageName;
 
             if (string.IsNullOrEmpty(rootDirectory))
-                rootDirectory = CacheHelper.GetDefaultCacheRoot();
+                rootDirectory = GetDefaultCacheRoot();
 
             _packageRoot = PathUtility.Combine(rootDirectory, packageName);
             _cacheFileRoot = PathUtility.Combine(_packageRoot, DefaultCacheFileSystemDefine.SaveFilesFolderName);
@@ -520,6 +520,16 @@ namespace YooAsset
         #endregion
 
         #region 内部方法
+        public string GetDefaultCacheRoot()
+        {
+#if UNITY_EDITOR
+            return YooAssetSettingsData.GetYooEditorCacheRoot();
+#elif UNITY_STANDALONE
+            return YooAssetSettingsData.GetYooStandaloneCacheRoot();
+#else
+            return YooAssetSettingsData.GetYooMobileCacheRoot();
+#endif
+        }
         public string GetCacheFileLoadPath(PackageBundle bundle)
         {
             return GetDataFilePath(bundle);
