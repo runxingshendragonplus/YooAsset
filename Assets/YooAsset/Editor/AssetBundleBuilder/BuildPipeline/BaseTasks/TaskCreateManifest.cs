@@ -196,9 +196,12 @@ namespace YooAsset.Editor
                 CacheBundleTags(bundleID, assetTags);
 
                 var packageBundle = manifest.BundleList[bundleID];
-                foreach (var dependBundleID in packageBundle.DependIDs)
+                if (packageBundle.DependIDs != null)
                 {
-                    CacheBundleTags(dependBundleID, assetTags);
+                    foreach (var dependBundleID in packageBundle.DependIDs)
+                    {
+                        CacheBundleTags(dependBundleID, assetTags);
+                    }
                 }
             }
 
