@@ -38,7 +38,7 @@ namespace YooAsset
         /// </summary>
         public static string GetReportFileName(string packageName, string packageVersion)
         {
-            return $"{YooAssetSettings.ReportFileName}_{packageName}_{packageVersion}.json";
+            return $"{packageName}_{packageVersion}.report";
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace YooAsset
         /// </summary>
         public static string GetManifestBinaryFileName(string packageName, string packageVersion)
         {
-            return $"{Setting.ManifestFileName}_{packageName}_{packageVersion}.bytes";
+            return $"{packageName}_{packageVersion}.bytes";
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace YooAsset
         /// </summary>
         public static string GetManifestJsonFileName(string packageName, string packageVersion)
         {
-            return $"{Setting.ManifestFileName}_{packageName}_{packageVersion}.json";
+            return $"{packageName}_{packageVersion}.json";
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace YooAsset
         /// </summary>
         public static string GetPackageHashFileName(string packageName, string packageVersion)
         {
-            return $"{Setting.ManifestFileName}_{packageName}_{packageVersion}.hash";
+            return $"{packageName}_{packageVersion}.hash";
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace YooAsset
         /// </summary>
         public static string GetPackageVersionFileName(string packageName)
         {
-            return $"{Setting.ManifestFileName}_{packageName}.version";
+            return $"{packageName}.version";
         }
 
         #region 路径相关
